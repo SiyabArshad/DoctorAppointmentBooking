@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   Platform,
-  TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
@@ -16,14 +15,14 @@ import Icon from "../../../../assets/icons";
 import resps from "../../../../assets/typo";
 import { useTheme } from "../../../../context/themeContext";
 import { keyboardVerticalOffset } from "../../../../helpers/common";
-import { SignupSchema } from "../../../../utlis/schemas/auth";
+import { ForgotPassSchema } from "../../../../utlis/schemas/auth";
 
 import CustomStatusBar from "../../../common/CustomStatusBar";
 import PlainHeader from "../../../common/PlainHeader";
 import Button from "../../../common/Button";
 import CustomTextInput from "../../../common/TextInput";
 
-export default function Signup() {
+export default function ForgotPassword() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -80,31 +79,18 @@ export default function Signup() {
       >
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
           <Formik
-            initialValues={{ name: "", email: "", password: "" }}
-            validationSchema={SignupSchema}
+            initialValues={{ email: "" }}
+            validationSchema={ForgotPassSchema}
             onSubmit={(values) => handleSubmit(values)}
           >
             {({ handleChange, handleSubmit, values, errors, touched }) => (
               <>
                 <View style={styles.texts}>
-                  <Text style={styles.h1}>Create Your</Text>
-                  <Text style={styles.h1}>Account With us</Text>
+                  <Text style={styles.h1}>Forgot Password?</Text>
+                  <Text style={styles.h1}>Don't Worry</Text>
                 </View>
 
                 <View style={styles.inps}>
-                  <CustomTextInput
-                    icon={
-                      <Icon.AntDesign
-                        name="user"
-                        size={24}
-                        color={theme.grey600}
-                      />
-                    }
-                    placeholder={"Enter your name"}
-                    onChange={handleChange("name")}
-                    value={values.name}
-                    message={touched.name && errors.name && errors.name}
-                  />
                   <CustomTextInput
                     icon={
                       <Icon.AntDesign
@@ -118,28 +104,9 @@ export default function Signup() {
                     value={values.email}
                     message={touched.email && errors.email && errors.email}
                   />
-                  <CustomTextInput
-                    isPassword={true}
-                    onChange={handleChange("password")}
-                    value={values.password}
-                    message={
-                      touched.password && errors.password && errors.password
-                    }
-                    icon={
-                      <Icon.AntDesign
-                        name="lock"
-                        size={24}
-                        color={theme.grey600}
-                      />
-                    }
-                    placeholder={"Enter Password"}
-                  />
                 </View>
 
-                <Button text={"Signup"} onPress={handleSubmit} />
-                <TouchableOpacity onPress={() => {}} style={styles.alreadybtn}>
-                  <Text style={styles.h5}> Already have an account ?</Text>
-                </TouchableOpacity>
+                <Button text={"Send Recovery Mail"} onPress={handleSubmit} />
               </>
             )}
           </Formik>

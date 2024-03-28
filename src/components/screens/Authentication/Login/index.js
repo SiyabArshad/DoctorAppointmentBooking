@@ -16,14 +16,14 @@ import Icon from "../../../../assets/icons";
 import resps from "../../../../assets/typo";
 import { useTheme } from "../../../../context/themeContext";
 import { keyboardVerticalOffset } from "../../../../helpers/common";
-import { SignupSchema } from "../../../../utlis/schemas/auth";
+import { LoginSchema } from "../../../../utlis/schemas/auth";
 
 import CustomStatusBar from "../../../common/CustomStatusBar";
 import PlainHeader from "../../../common/PlainHeader";
 import Button from "../../../common/Button";
 import CustomTextInput from "../../../common/TextInput";
 
-export default function Signup() {
+export default function Login() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -50,11 +50,11 @@ export default function Signup() {
     alreadybtn: {
       marginTop: resps.hp(2),
       alignSelf: "center",
-      textDecorationLine: "underline",
     },
     h5: {
       color: theme.black,
       fontWeight: "500",
+      textDecorationLine: "underline",
     },
     inps: {
       marginBottom: resps.hp(5),
@@ -80,31 +80,18 @@ export default function Signup() {
       >
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
           <Formik
-            initialValues={{ name: "", email: "", password: "" }}
-            validationSchema={SignupSchema}
+            initialValues={{ email: "", password: "" }}
+            validationSchema={LoginSchema}
             onSubmit={(values) => handleSubmit(values)}
           >
             {({ handleChange, handleSubmit, values, errors, touched }) => (
               <>
                 <View style={styles.texts}>
-                  <Text style={styles.h1}>Create Your</Text>
-                  <Text style={styles.h1}>Account With us</Text>
+                  <Text style={styles.h1}>Welcome</Text>
+                  <Text style={styles.h1}>Back!</Text>
                 </View>
 
                 <View style={styles.inps}>
-                  <CustomTextInput
-                    icon={
-                      <Icon.AntDesign
-                        name="user"
-                        size={24}
-                        color={theme.grey600}
-                      />
-                    }
-                    placeholder={"Enter your name"}
-                    onChange={handleChange("name")}
-                    value={values.name}
-                    message={touched.name && errors.name && errors.name}
-                  />
                   <CustomTextInput
                     icon={
                       <Icon.AntDesign
@@ -136,9 +123,9 @@ export default function Signup() {
                   />
                 </View>
 
-                <Button text={"Signup"} onPress={handleSubmit} />
+                <Button text={"Signin"} onPress={handleSubmit} />
                 <TouchableOpacity onPress={() => {}} style={styles.alreadybtn}>
-                  <Text style={styles.h5}> Already have an account ?</Text>
+                  <Text style={styles.h5}>Don't have an account ?</Text>
                 </TouchableOpacity>
               </>
             )}

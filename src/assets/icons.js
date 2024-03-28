@@ -1,8 +1,10 @@
 import {
   AntDesign,
   FontAwesome,
+  FontAwesome5,
   Ionicons,
   MaterialCommunityIcons,
+  MaterialIcons,
   Entypo,
   Feather,
   Fontisto,

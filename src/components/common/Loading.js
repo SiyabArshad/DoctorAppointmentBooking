@@ -1,6 +1,8 @@
 import React from "react";
 import { Modal, View, ActivityIndicator, Dimensions } from "react-native";
 
+import PropTypes from "prop-types";
+
 const windowHeight = Dimensions.get("window").height;
 
 import { useTheme } from "../../context/themeContext";

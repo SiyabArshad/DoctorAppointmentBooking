@@ -8,13 +8,14 @@ import { routes } from "./routes";
 import Signup from "../screens/Authentication/Signup";
 import Login from "../screens/Authentication/Login";
 import ForgotPassword from "../screens/Authentication/PasswordRecovery";
+import BottomTab from "./Bottomtab";
 
 const Stack = createNativeStackNavigator();
 export default function RootNavigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={routes.signupScreen}
+        initialRouteName={routes.tabScreen}
         screenOptions={{
           headerShadowVisible: false,
           headerShown: false,
@@ -33,6 +34,11 @@ export default function RootNavigation() {
         <Stack.Screen
           name={routes.forgotScreen}
           component={ForgotPassword}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={routes.tabScreen}
+          component={BottomTab}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

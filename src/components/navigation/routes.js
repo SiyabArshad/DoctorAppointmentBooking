@@ -2,6 +2,9 @@ export const routes = {
   loginScreen: "loginScreen",
   signupScreen: "signupScreen",
   forgotScreen: "forgotScreen",
-  homeScreen: "homeScreen",
+  tabScreen: "tabScreen",
+  servicesScreen: "servicesScreen",
   bookingScreen: "bookingScreen",
+  notificationScreen: "notificationScreen",
+  settingScreen: "settingScreen",
 };

@@ -10,6 +10,8 @@ import { useTheme } from "../../../context/themeContext";
 
 //screens
 import Bookings from "../../screens/Bookings/index";
+import Services from "../../screens/Services/index";
+import Notifications from "../../screens/Notification";
 
 const Tab = createBottomTabNavigator();
 export default function BottomTab() {
@@ -40,7 +42,7 @@ export default function BottomTab() {
           ),
         }}
         name={routes.servicesScreen}
-        component={Bookings}
+        component={Services}
       />
       <Tab.Screen
         options={{
@@ -67,7 +69,7 @@ export default function BottomTab() {
           ),
         }}
         name={routes.notificationScreen}
-        component={Bookings}
+        component={Notifications}
       />
       <Tab.Screen
         options={{

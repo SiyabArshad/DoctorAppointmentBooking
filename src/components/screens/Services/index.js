@@ -16,9 +16,9 @@ import { useTheme } from "../../../context/themeContext";
 import { images } from "../../../assets/images";
 
 import CustomStatusBar from "../../common/CustomStatusBar";
-import Empty from "../../common/Empty";
+import Icon from "../../../assets/icons";
 
-export default function Bookings() {
+export default function Services() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -61,13 +61,8 @@ export default function Bookings() {
       color: theme.black,
     },
     h5: {
-      marginBottom: resps.hp(1),
+      marginBottom: resps.hp(2),
       color: theme.black,
-    },
-    p: {
-      marginBottom: resps.hp(0.5),
-      color: theme.black,
-      fontWeight: "500",
     },
     tag: {
       backgroundColor: theme.primary,
@@ -80,6 +75,26 @@ export default function Bookings() {
       color: theme.white,
       fontWeight: "600",
     },
+    header: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: resps.wp(2),
+      marginTop: resps.hp(2),
+      marginBottom: resps.hp(1),
+    },
+    head: {
+      color: theme.primary,
+      fontWeight: "bold",
+      fontSize: resps.hp(3),
+    },
+    actions: {
+      display: "flex",
+      alignItems: "center",
+      flexDirection: "row",
+      gap: resps.wp(2),
+    },
   });
   return (
     <View style={styles.container}>
@@ -90,6 +105,17 @@ export default function Bookings() {
           translucent={true}
         />
       )}
+      <View style={styles.header}>
+        <Text style={styles.head}>Services</Text>
+        <View style={styles.actions}>
+          <TouchableOpacity>
+            <Icon.AntDesign name="pluscircle" size={28} color={theme.black} />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Icon.Fontisto name="date" size={28} color={theme.black} />
+          </TouchableOpacity>
+        </View>
+      </View>
       <FlatList
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scroll}
@@ -103,17 +129,14 @@ export default function Bookings() {
             <View style={styles.texts}>
               <Text style={styles.h2}>Asteria hotel</Text>
               <Text style={styles.h5}>Wilora NT 0872, Australia</Text>
-              <Text style={styles.p}>Json King</Text>
-              <Text style={styles.p}>09/08/2024 17:30</Text>
               <View style={styles.tag}>
-                <Text style={styles.price}>Pending</Text>
+                <Text style={styles.price}>194 £</Text>
               </View>
             </View>
           </TouchableOpacity>
         )}
         keyExtractor={(_item, index) => index.toLocaleString()}
       />
-      {/* <Empty /> */}
     </View>
   );
 }

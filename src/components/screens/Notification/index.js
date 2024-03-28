@@ -1,24 +1,16 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Platform,
-  FlatList,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, Platform, FlatList } from "react-native";
 import React from "react";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import Icon from "../../../assets/icons";
 import resps from "../../../assets/typo";
 import { useTheme } from "../../../context/themeContext";
-import { images } from "../../../assets/images";
 
 import CustomStatusBar from "../../common/CustomStatusBar";
 import Empty from "../../common/Empty";
 
-export default function Bookings() {
+export default function Notifications() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -30,55 +22,34 @@ export default function Bookings() {
       paddingTop: insets.top,
       paddingHorizontal: resps.wp(4),
     },
-    serviceimg: {
-      height: resps.hp(13),
-      width: resps.hp(13),
-      objectFit: "cover",
-      borderRadius: resps.hp(0.6),
-    },
+
     scroll: {
       paddingTop: resps.hp(2),
       paddingBottom: resps.hp(5),
     },
     card: {
       width: "100%",
-      marginBottom: resps.hp(2),
+      marginBottom: resps.hp(1.4),
       display: "flex",
       flexDirection: "row",
       alignItems: "center",
-      gap: resps.wp(5),
+      gap: resps.wp(3),
       backgroundColor: theme.grey300,
       borderRadius: resps.hp(1),
       paddingHorizontal: resps.wp(2),
       paddingVertical: resps.hp(1),
     },
-    texts: {
-      flex: 1,
-    },
+    texts: {},
     h2: {
-      marginBottom: resps.hp(1.4),
+      marginTop: resps.hp(1),
+      marginBottom: resps.hp(0.3),
       fontWeight: "bold",
-      color: theme.black,
-    },
-    h5: {
-      marginBottom: resps.hp(1),
-      color: theme.black,
+      color: theme.primary,
+      fontSize: resps.hp(2),
     },
     p: {
-      marginBottom: resps.hp(0.5),
       color: theme.black,
-      fontWeight: "500",
-    },
-    tag: {
-      backgroundColor: theme.primary,
-      alignSelf: "flex-end",
-      paddingHorizontal: resps.wp(3),
-      paddingVertical: resps.hp(0.5),
-      borderRadius: resps.hp(100),
-    },
-    price: {
-      color: theme.white,
-      fontWeight: "600",
+      marginBottom: resps.hp(0.5),
     },
   });
   return (
@@ -95,21 +66,13 @@ export default function Bookings() {
         contentContainerStyle={styles.scroll}
         data={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card}>
-            <Image
-              source={images.dummyServiceImage}
-              style={styles.serviceimg}
-            />
+          <View style={styles.card}>
+            <Icon.Entypo name="bell" size={28} color={theme.primary} />
             <View style={styles.texts}>
-              <Text style={styles.h2}>Asteria hotel</Text>
-              <Text style={styles.h5}>Wilora NT 0872, Australia</Text>
-              <Text style={styles.p}>Json King</Text>
-              <Text style={styles.p}>09/08/2024 17:30</Text>
-              <View style={styles.tag}>
-                <Text style={styles.price}>Pending</Text>
-              </View>
+              <Text style={styles.h2}>Congratulations</Text>
+              <Text style={styles.p}>Jhon has just booked an appointment.</Text>
             </View>
-          </TouchableOpacity>
+          </View>
         )}
         keyExtractor={(_item, index) => index.toLocaleString()}
       />

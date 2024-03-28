@@ -17,13 +17,14 @@ import resps from "../../../../assets/typo";
 import { useTheme } from "../../../../context/themeContext";
 import { keyboardVerticalOffset } from "../../../../helpers/common";
 import { SignupSchema } from "../../../../utlis/schemas/auth";
+import { routes } from "../../../navigation/routes";
 
 import CustomStatusBar from "../../../common/CustomStatusBar";
 import PlainHeader from "../../../common/PlainHeader";
 import Button from "../../../common/Button";
 import CustomTextInput from "../../../common/TextInput";
 
-export default function Signup() {
+export default function Signup(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -72,7 +73,11 @@ export default function Signup() {
           translucent={true}
         />
       )}
-      <PlainHeader onPress={() => {}} />
+      <PlainHeader
+        onPress={() => {
+          props?.navigation?.pop();
+        }}
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={keyboardVerticalOffset}
@@ -137,7 +142,12 @@ export default function Signup() {
                 </View>
 
                 <Button text={"Signup"} onPress={handleSubmit} />
-                <TouchableOpacity onPress={() => {}} style={styles.alreadybtn}>
+                <TouchableOpacity
+                  onPress={() => {
+                    props?.navigation?.navigate(routes.loginScreen);
+                  }}
+                  style={styles.alreadybtn}
+                >
                   <Text style={styles.h5}> Already have an account ?</Text>
                 </TouchableOpacity>
               </>

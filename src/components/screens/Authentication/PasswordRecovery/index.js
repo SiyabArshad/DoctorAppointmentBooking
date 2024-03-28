@@ -22,7 +22,7 @@ import PlainHeader from "../../../common/PlainHeader";
 import Button from "../../../common/Button";
 import CustomTextInput from "../../../common/TextInput";
 
-export default function ForgotPassword() {
+export default function ForgotPassword(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -71,7 +71,11 @@ export default function ForgotPassword() {
           translucent={true}
         />
       )}
-      <PlainHeader onPress={() => {}} />
+      <PlainHeader
+        onPress={() => {
+          props?.navigation?.pop();
+        }}
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={keyboardVerticalOffset}

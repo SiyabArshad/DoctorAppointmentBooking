@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Platform,
   FlatList,
-  TouchableOpacity,
   Image,
 } from "react-native";
 import React from "react";
@@ -102,7 +101,7 @@ export default function History(props) {
         contentContainerStyle={styles.scroll}
         data={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card}>
+          <View style={styles.card}>
             <Image
               source={images.dummyServiceImage}
               style={styles.serviceimg}
@@ -116,7 +115,7 @@ export default function History(props) {
                 <Text style={styles.price}>Pending</Text>
               </View>
             </View>
-          </TouchableOpacity>
+          </View>
         )}
         keyExtractor={(_item, index) => index.toLocaleString()}
       />

@@ -11,10 +11,10 @@ import React from "react";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import resps from "../../../../assets/typo";
 import { useTheme } from "../../../../context/themeContext";
 import { images } from "../../../../assets/images";
 
+import resps from "../../../../assets/typo";
 import CustomStatusBar from "../../../common/CustomStatusBar";
 import PlainHeader from "../../../common/PlainHeader";
 import Empty from "../../../common/Empty";

@@ -13,13 +13,13 @@ import Toast from "react-native-root-toast";
 import { Formik } from "formik";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import resps from "../../../../assets/typo";
 import { useTheme } from "../../../../context/themeContext";
 import { images } from "../../../../assets/images";
 import { ProfileSchema } from "../../../../utlis/schemas/auth";
 import { keyboardVerticalOffset } from "../../../../helpers/common";
 import { pickImage } from "../../../../helpers/permissions";
 
+import resps from "../../../../assets/typo";
 import CustomStatusBar from "../../../common/CustomStatusBar";
 import PlainHeader from "../../../common/PlainHeader";
 import Button from "../../../common/Button";

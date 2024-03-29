@@ -11,12 +11,12 @@ import React from "react";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import Icon from "../../../assets/icons";
 import { images } from "../../../assets/images/index";
-import resps from "../../../assets/typo";
 import { useTheme } from "../../../context/themeContext";
 import { routes } from "../../navigation/routes";
 
+import Icon from "../../../assets/icons";
+import resps from "../../../assets/typo";
 import CustomStatusBar from "../../common/CustomStatusBar";
 
 export default function ProfileScreen(props) {

@@ -6,5 +6,8 @@ export const routes = {
   servicesScreen: "servicesScreen",
   bookingScreen: "bookingScreen",
   notificationScreen: "notificationScreen",
-  settingScreen: "settingScreen",
+  profileNavigator: "profileNavigator",
+  profileScreen: "profileScreen",
+  historyScreen: "historyScreen",
+  updateProfile: "updateProfileScreen",
 };

@@ -29,7 +29,7 @@ export default function Notifications() {
     },
     card: {
       width: "100%",
-      marginBottom: resps.hp(1.4),
+      marginBottom: resps.hp(1.2),
       display: "flex",
       flexDirection: "row",
       alignItems: "center",

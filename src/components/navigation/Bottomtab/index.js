@@ -12,6 +12,7 @@ import { useTheme } from "../../../context/themeContext";
 import Bookings from "../../screens/Bookings/index";
 import Services from "../../screens/Services/index";
 import Notifications from "../../screens/Notification";
+import ProfileNavigator from "../ProfileNavigator";
 
 const Tab = createBottomTabNavigator();
 export default function BottomTab() {
@@ -73,16 +74,16 @@ export default function BottomTab() {
       />
       <Tab.Screen
         options={{
-          tabBarLabel: "Settings",
+          tabBarLabel: "Profile",
           tabBarLabelStyle: {
             marginBottom: resps.hp(0.8),
           },
           tabBarIcon: ({ color }) => (
-            <Icon.AntDesign name="setting" color={color} size={28} />
+            <Icon.AntDesign name="user" color={color} size={28} />
           ),
         }}
-        name={routes.settingScreen}
-        component={Bookings}
+        name={routes.profileNavigator}
+        component={ProfileNavigator}
       />
     </Tab.Navigator>
   );

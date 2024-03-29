@@ -83,6 +83,8 @@ export default function ForgotPassword(props) {
       >
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
           <Formik
+            validateOnBlur={false}
+            validateOnChange={false}
             initialValues={{ email: "" }}
             validationSchema={ForgotPassSchema}
             onSubmit={(values) => handleSubmit(values)}

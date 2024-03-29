@@ -20,3 +20,8 @@ export const LoginSchema = yup.object().shape({
 export const ForgotPassSchema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
 });
+
+export const ProfileSchema = yup.object().shape({
+  name: yup.string().required("Name is required"),
+  bio: yup.string().required("Bio is required"),
+});

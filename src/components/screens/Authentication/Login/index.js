@@ -85,6 +85,8 @@ export default function Login(props) {
       >
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
           <Formik
+            validateOnBlur={false}
+            validateOnChange={false}
             initialValues={{ email: "", password: "" }}
             validationSchema={LoginSchema}
             onSubmit={(values) => handleSubmit(values)}

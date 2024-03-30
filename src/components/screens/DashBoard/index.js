@@ -68,7 +68,9 @@ export default function DashBoard(props) {
       <View style={styles.header}>
         <Text style={styles.head}>Your Services</Text>
         <View style={styles.actions}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => props?.navigation?.navigate(routes.addService)}
+          >
             <Icon.AntDesign name="pluscircle" size={28} color={theme.primary} />
           </TouchableOpacity>
         </View>

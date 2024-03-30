@@ -11,6 +11,7 @@ import { useTheme } from "../../../context/themeContext";
 //screens
 import Bookings from "../../screens/Bookings/index";
 import Services from "../../screens/Services/index";
+import DashBoard from "../../screens/DashBoard";
 import Notifications from "../../screens/Notification";
 import ProfileNavigator from "../ProfileNavigator";
 
@@ -18,6 +19,7 @@ const Tab = createBottomTabNavigator();
 export default function BottomTab() {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
+  const isAdmin = true;
   return (
     <Tab.Navigator
       initialRouteName={routes.homeScreen}
@@ -34,7 +36,7 @@ export default function BottomTab() {
     >
       <Tab.Screen
         options={{
-          tabBarLabel: "Services",
+          tabBarLabel: `${isAdmin ? "DashBoard" : "Services"}`,
           tabBarLabelStyle: {
             marginBottom: resps.hp(0.8),
           },
@@ -43,7 +45,7 @@ export default function BottomTab() {
           ),
         }}
         name={routes.servicesScreen}
-        component={Services}
+        component={isAdmin ? DashBoard : Services}
       />
       <Tab.Screen
         options={{

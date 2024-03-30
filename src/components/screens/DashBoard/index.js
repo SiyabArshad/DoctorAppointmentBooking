@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import React from "react";
 
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import resps from "../../../assets/typo";
@@ -18,22 +17,9 @@ import CustomStatusBar from "../../common/CustomStatusBar";
 import Icon from "../../../assets/icons";
 import ServiceItem from "../../common/ServiceItem";
 
-export default function Services() {
+export default function DashBoard() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const [date, setDate] = React.useState(new Date());
-  const [showPicker, setShowPicker] = React.useState(false);
-  const futureDate = new Date(); // Get today's date
-  futureDate.setDate(futureDate.getDate() + 1); // Increment by one day
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowPicker(false);
-    setDate(currentDate);
-  };
-
-  const onDatepickerOpen = () => {
-    setShowPicker(true);
-  };
   //styles
   const styles = StyleSheet.create({
     container: {
@@ -77,20 +63,12 @@ export default function Services() {
           translucent={true}
         />
       )}
-      {showPicker && (
-        <DateTimePicker
-          value={date}
-          mode="date"
-          display="calendar"
-          minimumDate={futureDate} // Set the minimum date to tomorrow
-          onChange={onDateChange}
-        />
-      )}
+
       <View style={styles.header}>
-        <Text style={styles.head}>Services</Text>
+        <Text style={styles.head}>Your Services</Text>
         <View style={styles.actions}>
-          <TouchableOpacity onPress={onDatepickerOpen}>
-            <Icon.Fontisto name="date" size={28} color={theme.primary} />
+          <TouchableOpacity>
+            <Icon.AntDesign name="pluscircle" size={28} color={theme.primary} />
           </TouchableOpacity>
         </View>
       </View>

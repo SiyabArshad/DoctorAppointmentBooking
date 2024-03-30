@@ -13,12 +13,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import resps from "../../../assets/typo";
 import { useTheme } from "../../../context/themeContext";
+import { routes } from "../../navigation/routes";
 
 import CustomStatusBar from "../../common/CustomStatusBar";
 import Icon from "../../../assets/icons";
 import ServiceItem from "../../common/ServiceItem";
 
-export default function Services() {
+export default function Services(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const [date, setDate] = React.useState(new Date());
@@ -99,7 +100,11 @@ export default function Services() {
         contentContainerStyle={styles.scroll}
         data={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
         renderItem={({ item, index }) => (
-          <ServiceItem item={item} index={index} />
+          <ServiceItem
+            onPress={() => props?.navigation?.navigate(routes.detailScreen)}
+            item={item}
+            index={index}
+          />
         )}
         keyExtractor={(_item, index) => index.toLocaleString()}
       />

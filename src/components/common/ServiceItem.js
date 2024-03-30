@@ -8,7 +8,7 @@ import { useTheme } from "../../context/themeContext";
 
 import resps from "../../assets/typo";
 
-export default function ServiceItem({ item, index }) {
+export default function ServiceItem({ item, index, onPress }) {
   const { theme } = useTheme();
 
   //styles
@@ -56,7 +56,7 @@ export default function ServiceItem({ item, index }) {
     },
   });
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity onPress={onPress} style={styles.card}>
       <Image source={images.dummyServiceImage} style={styles.serviceimg} />
       <View style={styles.texts}>
         <Text style={styles.h2}>Asteria hotel</Text>
@@ -72,4 +72,5 @@ export default function ServiceItem({ item, index }) {
 ServiceItem.propTypes = {
   item: PropTypes.any.isRequired,
   index: PropTypes.number.isRequired,
+  onPress: PropTypes.func,
 };

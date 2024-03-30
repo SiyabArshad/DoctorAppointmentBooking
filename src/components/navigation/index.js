@@ -8,6 +8,7 @@ import { routes } from "./routes";
 import Signup from "../screens/Authentication/Signup";
 import Login from "../screens/Authentication/Login";
 import ForgotPassword from "../screens/Authentication/PasswordRecovery";
+import DetailScreen from "../screens/Detail";
 import BottomTab from "./Bottomtab";
 
 const Stack = createNativeStackNavigator();
@@ -39,6 +40,11 @@ export default function RootNavigation() {
         <Stack.Screen
           name={routes.tabScreen}
           component={BottomTab}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={routes.detailScreen}
+          component={DetailScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

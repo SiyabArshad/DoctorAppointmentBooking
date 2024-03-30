@@ -10,4 +10,8 @@ export const routes = {
   profileScreen: "profileScreen",
   historyScreen: "historyScreen",
   updateProfile: "updateProfileScreen",
+  detailScreen: "detailScreen",
+  addService: "addService",
+  updateService: "updateService",
+  mapScreenSingle: "singlemapScreen",
 };

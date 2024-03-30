@@ -11,6 +11,7 @@ import ForgotPassword from "../screens/Authentication/PasswordRecovery";
 import DetailScreen from "../screens/Detail";
 import AddService from "../screens/Services/Add";
 import UpdateService from "../screens/Services/Update";
+import MapViewAppointment from "../screens/Map";
 import BottomTab from "./Bottomtab";
 
 const Stack = createNativeStackNavigator();
@@ -57,6 +58,11 @@ export default function RootNavigation() {
         <Stack.Screen
           name={routes.updateService}
           component={UpdateService}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={routes.mapScreenSingle}
+          component={MapViewAppointment}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

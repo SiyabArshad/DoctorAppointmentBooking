@@ -15,12 +15,17 @@ import * as Location from "expo-location";
 import Toast from "react-native-root-toast";
 import { Formik } from "formik";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 
 import Icon from "../../../../assets/icons";
 import resps from "../../../../assets/typo";
 import { useTheme } from "../../../../context/themeContext";
 import { keyboardVerticalOffset } from "../../../../helpers/common";
 import { pickImage } from "../../../../helpers/permissions";
+import {
+  uploadImage,
+  addnewdocumenttofiretore,
+} from "../../../../helpers/firebasefunctions/firebasefuncs";
 
 import serviceSchema from "../../../../utlis/schemas/service";
 import CustomStatusBar from "../../../common/CustomStatusBar";
@@ -28,70 +33,114 @@ import PlainHeader from "../../../common/PlainHeader";
 import Button from "../../../common/Button";
 import CustomTextInput from "../../../common/TextInput";
 import CustomMultiLineTextInput from "../../../common/MultiLineInput";
+import Loading from "../../../common/Loading";
 
 //data
-const appDays = [
-  {
-    key: 0,
-    value: "Monday",
-  },
-  {
-    key: 1,
-    value: "Tuesday",
-  },
-  {
-    key: 2,
-    value: "Wednesday",
-  },
-  {
-    key: 3,
-    value: "Thursday",
-  },
-  {
-    key: 4,
-    value: "Friday",
-  },
-  {
-    key: 5,
-    value: "Saturday",
-  },
-];
+// const appDays = [
+//   {
+//     key: 0,
+//     value: "Monday",
+//   },
+//   {
+//     key: 1,
+//     value: "Tuesday",
+//   },
+//   {
+//     key: 2,
+//     value: "Wednesday",
+//   },
+//   {
+//     key: 3,
+//     value: "Thursday",
+//   },
+//   {
+//     key: 4,
+//     value: "Friday",
+//   },
+//   {
+//     key: 5,
+//     value: "Saturday",
+//   },
+// ];
 export default function AddService(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const [image, setImage] = React.useState(null);
-  const [selectedDays, setSelectedDays] = React.useState(appDays);
+  const [isload, setIsload] = React.useState(false);
+  // const [selectedDays, setSelectedDays] = React.useState(appDays);
+  const user = useSelector((state) => state?.auth);
 
   async function handleSubmit(values) {
-    if (selectedDays.length === 0) {
-      alertdata("Select atleast one day");
-      return;
-    }
     if (image === null) {
       alertdata("Image required");
       return;
     }
-    const coords = await getAddressCoordinates(values.address);
-    if (coords) {
-      console.log("I am cords", coords);
+    setIsload(true);
+    try {
+      const coords = await getAddressCoordinates(values.address);
+      if (user?.user?.isAdmin) {
+        const res = await uploadImage("services", image?.assets[0]);
+        if (res?.status) {
+          await addnewdocumenttofiretore(
+            "services",
+            {
+              userid: user?.user?.userid,
+              desc: values?.desc,
+              title: values?.title,
+              picture: res?.url,
+              address: values?.address,
+              location: coords,
+              isActive: true,
+            },
+            null
+          );
+          Toast.show("you have created service successfully", {
+            duration: Toast.durations.LONG,
+            backgroundColor: theme.success,
+            opacity: 0.8,
+            position: Toast.positions.TOP,
+          });
+        } else {
+          Toast.show("Image not uploaded for the service", {
+            duration: Toast.durations.LONG,
+            backgroundColor: theme.warning,
+            opacity: 0.8,
+            position: Toast.positions.TOP,
+          });
+        }
+      } else {
+        Toast.show("Only Admin can create service", {
+          duration: Toast.durations.LONG,
+          backgroundColor: theme.warning,
+          opacity: 0.8,
+          position: Toast.positions.TOP,
+        });
+      }
+    } catch {
+      Toast.show("Failed to create service", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.warning,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+    } finally {
+      setIsload(false);
     }
-
-    console.log(values);
   }
   //day switch
-  const handleDayChange = (dayObject) => {
-    const existingIndex = selectedDays.findIndex(
-      (item) => item.key === dayObject.key || item.value === dayObject.value
-    );
+  // const handleDayChange = (dayObject) => {
+  //   const existingIndex = selectedDays.findIndex(
+  //     (item) => item.key === dayObject.key || item.value === dayObject.value
+  //   );
 
-    if (existingIndex !== -1) {
-      setSelectedDays((prevDays) =>
-        prevDays.filter((day, index) => index !== existingIndex)
-      );
-    } else {
-      setSelectedDays((prevDays) => [...prevDays, dayObject]);
-    }
-  };
+  //   if (existingIndex !== -1) {
+  //     setSelectedDays((prevDays) =>
+  //       prevDays.filter((day, index) => index !== existingIndex)
+  //     );
+  //   } else {
+  //     setSelectedDays((prevDays) => [...prevDays, dayObject]);
+  //   }
+  // };
   //add image
   const handleUploadImage = async () => {
     try {
@@ -220,10 +269,9 @@ export default function AddService(props) {
       color: theme.white,
     },
     time: {
-      marginBottom: resps.hp(5),
-      marginTop: resps.hp(2),
-      textAlign: "right",
+      marginBottom: resps.hp(3),
       fontWeight: "bold",
+      paddingHorizontal: resps.wp(3),
     },
   });
   return (
@@ -235,6 +283,7 @@ export default function AddService(props) {
           translucent={true}
         />
       )}
+      <Loading show={isload} />
       <PlainHeader
         onPress={() => {
           props?.navigation?.pop();
@@ -299,7 +348,7 @@ export default function AddService(props) {
                       )}
                     </TouchableOpacity>
                   </View>
-                  <View style={styles.days}>
+                  {/* <View style={styles.days}>
                     {appDays.map((item, index) => (
                       <TouchableOpacity
                         onPress={() => handleDayChange(item)}
@@ -321,7 +370,7 @@ export default function AddService(props) {
                         </Text>
                       </TouchableOpacity>
                     ))}
-                  </View>
+                  </View> */}
                   <Text style={styles.time}>
                     Weekdays are from 9 to 5 and Saturday is from 12 to 3.
                   </Text>

@@ -62,7 +62,7 @@ export default function ServiceItem({ item, index, onPress }) {
         <Text style={styles.h2}>Asteria hotel</Text>
         <Text style={styles.h5}>Wilora NT 0872, Australia</Text>
         <View style={styles.tag}>
-          <Text style={styles.price}>Available</Text>
+          <Text style={styles.price}>Service</Text>
         </View>
       </View>
     </TouchableOpacity>

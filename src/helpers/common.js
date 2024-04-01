@@ -10,5 +10,5 @@ export const bookingStatus = {
 };
 
 export const validValue = (value) => {
-  return value !== undefined && value !== null && value !== "";
+  return value !== undefined && value !== null && value !== "" && value;
 };

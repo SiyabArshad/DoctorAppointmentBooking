@@ -28,45 +28,15 @@ import PlainHeader from "../../../common/PlainHeader";
 import Button from "../../../common/Button";
 import CustomTextInput from "../../../common/TextInput";
 import CustomMultiLineTextInput from "../../../common/MultiLineInput";
+import Loading from "../../../common/Loading";
 
-//data
-const appDays = [
-  {
-    key: 0,
-    value: "Monday",
-  },
-  {
-    key: 1,
-    value: "Tuesday",
-  },
-  {
-    key: 2,
-    value: "Wednesday",
-  },
-  {
-    key: 3,
-    value: "Thursday",
-  },
-  {
-    key: 4,
-    value: "Friday",
-  },
-  {
-    key: 5,
-    value: "Saturday",
-  },
-];
 export default function UpdateService(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const [isLoading, setIsLoading] = React.useState(false);
   const [image, setImage] = React.useState(null);
-  const [selectedDays, setSelectedDays] = React.useState(appDays);
 
   async function handleSubmit(values) {
-    if (selectedDays.length === 0) {
-      alertdata("Select atleast one day");
-      return;
-    }
     if (image === null) {
       alertdata("Image required");
       return;
@@ -78,20 +48,7 @@ export default function UpdateService(props) {
 
     console.log(values);
   }
-  //day switch
-  const handleDayChange = (dayObject) => {
-    const existingIndex = selectedDays.findIndex(
-      (item) => item.key === dayObject.key || item.value === dayObject.value
-    );
 
-    if (existingIndex !== -1) {
-      setSelectedDays((prevDays) =>
-        prevDays.filter((day, index) => index !== existingIndex)
-      );
-    } else {
-      setSelectedDays((prevDays) => [...prevDays, dayObject]);
-    }
-  };
   //add image
   const handleUploadImage = async () => {
     try {
@@ -220,10 +177,9 @@ export default function UpdateService(props) {
       color: theme.white,
     },
     time: {
-      marginBottom: resps.hp(5),
-      marginTop: resps.hp(2),
-      textAlign: "right",
+      marginBottom: resps.hp(3),
       fontWeight: "bold",
+      paddingHorizontal: resps.wp(3),
     },
   });
   return (
@@ -235,6 +191,7 @@ export default function UpdateService(props) {
           translucent={true}
         />
       )}
+      <Loading show={isLoading} />
       <PlainHeader
         onPress={() => {
           props?.navigation?.pop();
@@ -299,29 +256,7 @@ export default function UpdateService(props) {
                       )}
                     </TouchableOpacity>
                   </View>
-                  <View style={styles.days}>
-                    {appDays.map((item, index) => (
-                      <TouchableOpacity
-                        onPress={() => handleDayChange(item)}
-                        style={
-                          selectedDays.some(({ key }) => key === item?.key)
-                            ? styles.activetag
-                            : styles.tag
-                        }
-                        key={index.toLocaleString()}
-                      >
-                        <Text
-                          style={
-                            selectedDays.some(({ key }) => key === item?.key)
-                              ? styles.activetagtext
-                              : styles.tagtext
-                          }
-                        >
-                          {item.value.slice(0, 3)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+
                   <Text style={styles.time}>
                     Weekdays are from 9 to 5 and Saturday is from 12 to 3.
                   </Text>

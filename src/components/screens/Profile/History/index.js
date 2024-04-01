@@ -33,7 +33,7 @@ export default function History(props) {
     serviceimg: {
       height: resps.hp(13),
       width: resps.hp(13),
-      objectFit: "cover",
+      resizeMode: "cover",
       borderRadius: resps.hp(0.6),
     },
     scroll: {

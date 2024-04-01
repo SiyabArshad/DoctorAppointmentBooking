@@ -9,11 +9,14 @@ import {
 } from "react-native";
 import React from "react";
 
+import Toast from "react-native-root-toast";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDispatch } from "react-redux";
 
 import { images } from "../../../assets/images/index";
 import { useTheme } from "../../../context/themeContext";
 import { routes } from "../../navigation/routes";
+import { logout } from "../../../store/reducers/auth";
 
 import Icon from "../../../assets/icons";
 import resps from "../../../assets/typo";
@@ -22,7 +25,28 @@ import CustomStatusBar from "../../common/CustomStatusBar";
 export default function ProfileScreen(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch();
 
+  //logout Func
+  const logoutFunc = async () => {
+    try {
+      dispatch(logout());
+      Toast.show("Loggedout Sucessfully", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.success,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+      props?.navigation?.navigate(routes.signupScreen);
+    } catch {
+      Toast.show("Logout Failed", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.warning,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+    }
+  };
   //styles
   const styles = StyleSheet.create({
     container: {
@@ -121,10 +145,7 @@ export default function ProfileScreen(props) {
             />
             <Text style={styles.btntext}>Appointments History</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => props?.navigation?.navigate(routes.signupScreen)}
-            style={styles.btn}
-          >
+          <TouchableOpacity onPress={logoutFunc} style={styles.btn}>
             <Icon.AntDesign name="logout" size={28} color={theme.primary} />
             <Text style={styles.btntext}>Logout</Text>
           </TouchableOpacity>

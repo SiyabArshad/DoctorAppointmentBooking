@@ -2,6 +2,7 @@ import React from "react";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useSelector } from "react-redux";
 
 import { routes } from "./routes";
 //screens
@@ -16,10 +17,11 @@ import BottomTab from "./Bottomtab";
 
 const Stack = createNativeStackNavigator();
 export default function RootNavigation() {
+  const user = useSelector((state) => state?.auth);
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={routes.tabScreen}
+        initialRouteName={user?.user ? routes.tabScreen : routes.signupScreen}
         screenOptions={{
           headerShadowVisible: false,
           headerShown: false,

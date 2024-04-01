@@ -9,8 +9,11 @@ import {
 } from "react-native";
 import React from "react";
 
+import Toast from "react-native-root-toast";
 import { Formik } from "formik";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { doc, setDoc, getFirestore } from "firebase/firestore";
 
 import Icon from "../../../../assets/icons";
 import resps from "../../../../assets/typo";
@@ -18,18 +21,54 @@ import { useTheme } from "../../../../context/themeContext";
 import { keyboardVerticalOffset } from "../../../../helpers/common";
 import { SignupSchema } from "../../../../utlis/schemas/auth";
 import { routes } from "../../../navigation/routes";
+import { app } from "../../../../utlis/firebase";
 
 import CustomStatusBar from "../../../common/CustomStatusBar";
 import PlainHeader from "../../../common/PlainHeader";
 import Button from "../../../common/Button";
 import CustomTextInput from "../../../common/TextInput";
+import Loading from "../../../common/Loading";
 
 export default function Signup(props) {
+  const db = getFirestore(app);
+  const auth = getAuth(app);
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-
-  function handleSubmit(values) {
-    console.log(values);
+  const [isload, setIsload] = React.useState(false);
+  async function handleSubmit(values) {
+    setIsload(true);
+    try {
+      const newuser = await createUserWithEmailAndPassword(
+        auth,
+        values?.email,
+        values?.password
+      );
+      await setDoc(doc(db, "users", newuser?.user?.uid), {
+        userid: newuser?.user?.uid,
+        name: values?.name,
+        email: values?.email,
+        contact: "",
+        bio: "",
+        profilepic: "",
+        isAdmin: false,
+      });
+      Toast.show("Registration completed you can login", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.success,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+    } catch (e) {
+      console.log("Signup err", e);
+      Toast.show("Failed to register user", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.warning,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+    } finally {
+      setIsload(false);
+    }
   }
   //styles
   const styles = StyleSheet.create({
@@ -73,6 +112,7 @@ export default function Signup(props) {
           translucent={true}
         />
       )}
+      <Loading show={isload} />
       <PlainHeader
         onPress={() => {
           props?.navigation?.pop();

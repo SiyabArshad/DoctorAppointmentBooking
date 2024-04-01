@@ -8,3 +8,7 @@ export const bookingStatus = {
   declined: "Declined",
   cancelled: "Cancelled",
 };
+
+export const validValue = (value) => {
+  return value !== undefined && value !== null && value !== "";
+};

@@ -24,7 +24,7 @@ export default function BookingItem({ item, index }) {
     serviceimg: {
       height: resps.hp(13),
       width: resps.hp(13),
-      objectFit: "cover",
+      resizeMode: "cover",
       borderRadius: resps.hp(0.6),
     },
 

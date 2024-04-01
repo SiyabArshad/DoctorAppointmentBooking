@@ -2,6 +2,7 @@ import React from "react";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 
 import resps from "../../../assets/typo";
 import Icon from "../../../assets/icons";
@@ -20,6 +21,8 @@ export default function BottomTab() {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
   const isAdmin = true;
+  const user = useSelector((state) => state?.auth);
+
   return (
     <Tab.Navigator
       initialRouteName={routes.homeScreen}
@@ -36,7 +39,7 @@ export default function BottomTab() {
     >
       <Tab.Screen
         options={{
-          tabBarLabel: `${isAdmin ? "DashBoard" : "Services"}`,
+          tabBarLabel: `${user?.user?.isAdmin ? "DashBoard" : "Services"}`,
           tabBarLabelStyle: {
             marginBottom: resps.hp(0.8),
           },
@@ -45,7 +48,7 @@ export default function BottomTab() {
           ),
         }}
         name={routes.servicesScreen}
-        component={isAdmin ? DashBoard : Services}
+        component={user?.user?.isAdmin ? DashBoard : Services}
       />
       <Tab.Screen
         options={{

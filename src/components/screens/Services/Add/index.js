@@ -15,7 +15,7 @@ import * as Location from "expo-location";
 import Toast from "react-native-root-toast";
 import { Formik } from "formik";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import Icon from "../../../../assets/icons";
 import resps from "../../../../assets/typo";
@@ -26,6 +26,8 @@ import {
   uploadImage,
   addnewdocumenttofiretore,
 } from "../../../../helpers/firebasefunctions/firebasefuncs";
+import { fetchServicesByUserId } from "../../../../store/reducers/services";
+import { routes } from "../../../navigation/routes";
 
 import serviceSchema from "../../../../utlis/schemas/service";
 import CustomStatusBar from "../../../common/CustomStatusBar";
@@ -67,6 +69,8 @@ export default function AddService(props) {
   const insets = useSafeAreaInsets();
   const [image, setImage] = React.useState(null);
   const [isload, setIsload] = React.useState(false);
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state?.services);
   // const [selectedDays, setSelectedDays] = React.useState(appDays);
   const user = useSelector((state) => state?.auth);
 
@@ -100,6 +104,8 @@ export default function AddService(props) {
             opacity: 0.8,
             position: Toast.positions.TOP,
           });
+          dispatch(fetchServicesByUserId(user?.user?.userid));
+          props?.navigation?.navigate(routes?.tabScreen);
         } else {
           Toast.show("Image not uploaded for the service", {
             duration: Toast.durations.LONG,
@@ -283,7 +289,7 @@ export default function AddService(props) {
           translucent={true}
         />
       )}
-      <Loading show={isload} />
+      <Loading show={isload || loading} />
       <PlainHeader
         onPress={() => {
           props?.navigation?.pop();

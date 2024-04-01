@@ -7,6 +7,7 @@ import { images } from "../../assets/images";
 import { useTheme } from "../../context/themeContext";
 
 import resps from "../../assets/typo";
+import { validValue } from "../../helpers/common";
 
 export default function ServiceItem({ item, index, onPress }) {
   const { theme } = useTheme();
@@ -57,10 +58,23 @@ export default function ServiceItem({ item, index, onPress }) {
   });
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
-      <Image source={images.dummyServiceImage} style={styles.serviceimg} />
+      <Image
+        source={
+          validValue(item?.picture)
+            ? { uri: item?.picture }
+            : images?.dummyServiceImage
+        }
+        style={styles.serviceimg}
+      />
       <View style={styles.texts}>
-        <Text style={styles.h2}>Asteria hotel</Text>
-        <Text style={styles.h5}>Wilora NT 0872, Australia</Text>
+        <Text style={styles.h2}>{`${item?.title?.slice(0, 30)}${
+          item?.title?.length > 30 ? "..." : ""
+        }`}</Text>
+        <Text style={styles.h5}>
+          {`${item?.address?.slice(0, 30)}${
+            item?.address?.length > 30 ? "..." : ""
+          }`}
+        </Text>
         <View style={styles.tag}>
           <Text style={styles.price}>Service</Text>
         </View>

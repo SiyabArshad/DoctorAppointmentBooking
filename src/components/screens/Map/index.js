@@ -11,9 +11,10 @@ import Icon from "../../../assets/icons";
 export default function MapViewAppointment(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const item = props?.route?.params?.item;
   const [initialRegion, setInitialRegion] = useState({
-    latitude: 37.78825, // Default latitude (adjust as needed)
-    longitude: -122.4324, // Default longitude (adjust as needed)
+    latitude: item?.location?.latitude, // Default latitude (adjust as needed)
+    longitude: item?.location?.longitude, // Default longitude (adjust as needed)
     latitudeDelta: 0.2922, // Adjust for desired zoom level
     longitudeDelta: 0.0421, // Adjust for desired zoom level
   });
@@ -68,8 +69,8 @@ export default function MapViewAppointment(props) {
         >
           <Callout>
             <View style={styles.callout}>
-              <Text style={styles.title}>Enty Services</Text>
-              <Text style={styles.address}>Address random address here</Text>
+              <Text style={styles.title}>{item?.title}</Text>
+              <Text style={styles.address}>{item?.address}</Text>
             </View>
           </Callout>
         </Marker>

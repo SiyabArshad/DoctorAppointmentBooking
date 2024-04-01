@@ -5,22 +5,45 @@ import {
   Platform,
   FlatList,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import React from "react";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 
 import resps from "../../../assets/typo";
 import { useTheme } from "../../../context/themeContext";
 import { routes } from "../../navigation/routes";
+import { fetchServicesByUserId } from "../../../store/reducers/services";
 
 import CustomStatusBar from "../../common/CustomStatusBar";
 import Icon from "../../../assets/icons";
 import ServiceItem from "../../common/ServiceItem";
+import Loading from "../../common/Loading";
+import Empty from "../../common/Empty";
 
 export default function DashBoard(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state?.auth);
+  const { services, loading } = useSelector((state) => state?.services);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  //onRefresh
+  const onRefresh = () => {
+    setRefreshing(true);
+    dispatch(fetchServicesByUserId(user?.user?.userid))
+      .then(() => setRefreshing(false))
+      .catch(() => setRefreshing(false));
+  };
+  //sideffects
+  React.useEffect(() => {
+    dispatch(fetchServicesByUserId(user?.user?.userid))
+      .then(() => setRefreshing(false))
+      .catch(() => setRefreshing(false));
+  }, []);
   //styles
   const styles = StyleSheet.create({
     container: {
@@ -57,6 +80,7 @@ export default function DashBoard(props) {
   });
   return (
     <View style={styles.container}>
+      <Loading show={loading} />
       {Platform.OS === "android" && (
         <CustomStatusBar
           removeExtraHeight={true}
@@ -75,19 +99,28 @@ export default function DashBoard(props) {
           </TouchableOpacity>
         </View>
       </View>
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
-        data={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
-        renderItem={({ item, index }) => (
-          <ServiceItem
-            onPress={() => props?.navigation?.navigate(routes.detailScreen)}
-            item={item}
-            index={index}
-          />
-        )}
-        keyExtractor={(_item, index) => index.toLocaleString()}
-      />
+      {services?.length > 0 ? (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scroll}
+          data={services}
+          renderItem={({ item, index }) => (
+            <ServiceItem
+              onPress={() =>
+                props?.navigation?.navigate(routes.detailScreen, { item })
+              }
+              item={item}
+              index={index}
+            />
+          )}
+          keyExtractor={(_item, index) => index.toLocaleString()}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      ) : (
+        <Empty text="No Service Found" />
+      )}
     </View>
   );
 }

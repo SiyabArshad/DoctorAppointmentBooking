@@ -10,21 +10,29 @@ import {
 } from "react-native";
 import React from "react";
 
+import Toast from "react-native-root-toast";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 
 import Icon from "../../../assets/icons";
 import resps from "../../../assets/typo";
 import { useTheme } from "../../../context/themeContext";
 import { routes } from "../../navigation/routes";
-import { images } from "../../../assets/images/index";
+import { deletdoc } from "../../../helpers/firebasefunctions/firebasefuncs";
+import { fetchServicesByUserId } from "../../../store/reducers/services";
 
 import CustomStatusBar from "../../common/CustomStatusBar";
 import Button from "../../common/Button";
+import Loading from "../../common/Loading";
 
 export default function DetailScreen(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state?.services);
+  const [isLoad, setIsLoad] = React.useState(false);
+  const user = useSelector((state) => state?.auth);
+  const item = props?.route?.params?.item;
   //handle delete
   const handleDelete = () => {
     Alert.alert("Delete", "Are you sure you want to delete this service?", [
@@ -35,7 +43,30 @@ export default function DetailScreen(props) {
       },
       {
         text: "Delete",
-        onPress: () => {},
+        onPress: async () => {
+          setIsLoad(true);
+          try {
+            await deletdoc("services", item?.id);
+
+            dispatch(fetchServicesByUserId(user?.user?.userid));
+            props?.navigation?.navigate(routes?.tabScreen);
+            Toast.show("Service deleted successfully.", {
+              duration: Toast.durations.LONG,
+              backgroundColor: theme.success,
+              opacity: 0.8,
+              position: Toast.positions.TOP,
+            });
+          } catch {
+            Toast.show("Failed to delete service.", {
+              duration: Toast.durations.LONG,
+              backgroundColor: theme.warning,
+              opacity: 0.8,
+              position: Toast.positions.TOP,
+            });
+          } finally {
+            setIsLoad(false);
+          }
+        },
         style: "destructive",
       },
     ]);
@@ -131,6 +162,7 @@ export default function DetailScreen(props) {
   });
   return (
     <View style={styles.container}>
+      <Loading show={isLoad || loading} />
       {Platform.OS === "android" && (
         <CustomStatusBar
           removeExtraHeight={true}
@@ -149,7 +181,9 @@ export default function DetailScreen(props) {
         </TouchableOpacity>
         <View style={styles.actions}>
           <TouchableOpacity
-            onPress={() => props?.navigation?.navigate(routes.mapScreenSingle)}
+            onPress={() =>
+              props?.navigation?.navigate(routes.mapScreenSingle, { item })
+            }
           >
             <Icon.MaterialCommunityIcons
               size={28}
@@ -157,22 +191,28 @@ export default function DetailScreen(props) {
               name="map-marker-radius"
             />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => props?.navigation?.navigate(routes.updateService)}
-          >
-            <Icon.MaterialCommunityIcons
-              size={28}
-              color={theme.black}
-              name="file-edit-outline"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleDelete}>
-            <Icon.MaterialIcons
-              size={28}
-              color={theme.black}
-              name="delete-sweep"
-            />
-          </TouchableOpacity>
+          {item?.userid === user?.user?.userid && user?.user?.isAdmin && (
+            <>
+              <TouchableOpacity
+                onPress={() =>
+                  props?.navigation?.navigate(routes.updateService, { item })
+                }
+              >
+                <Icon.MaterialCommunityIcons
+                  size={28}
+                  color={theme.black}
+                  name="file-edit-outline"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleDelete}>
+                <Icon.MaterialIcons
+                  size={28}
+                  color={theme.black}
+                  name="delete-sweep"
+                />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
       <ScrollView
@@ -180,22 +220,11 @@ export default function DetailScreen(props) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.main}>
-          <Image source={images.dummyServiceImage} style={styles.banner} />
+          <Image source={{ uri: item?.picture }} style={styles.banner} />
           <View style={styles.texts}>
-            <Text style={styles.title}>Title of the service.</Text>
-            <Text style={styles.location}>Location of the service.</Text>
-            <Text style={styles.desc}>
-              It is a long established fact that a reader will be distracted by
-              the readable content of a page when looking at its layout. The
-              point of using Lorem Ipsum is that it has a more-or-less normal
-              distribution of letters, as opposed to using 'Content here,
-              content here', making it look like readable English. Many desktop
-              publishing packages and web page editors now use Lorem Ipsum as
-              their default model text, and a search for 'lorem ipsum' will
-              uncover many web sites still in their infancy. Various versions
-              have evolved over the years, sometimes by accident, sometimes on
-              purpose.
-            </Text>
+            <Text style={styles.title}>{item?.title}</Text>
+            <Text style={styles.location}>{item?.address}</Text>
+            <Text style={styles.desc}>{item?.desc}</Text>
           </View>
           <View style={styles.slots}>
             {[1, 2, 3, 4, 5, 6, 7, 8].map((item, index) => (
@@ -209,9 +238,11 @@ export default function DetailScreen(props) {
           </View>
         </View>
       </ScrollView>
-      <View style={styles.bookinhcontrol}>
-        <Button text={"Book now"} onPress={() => {}} />
-      </View>
+      {item?.userid !== user?.user?.userid && (
+        <View style={styles.bookinhcontrol}>
+          <Button text={"Book now"} onPress={() => {}} />
+        </View>
+      )}
     </View>
   );
 }

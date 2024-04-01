@@ -15,12 +15,19 @@ import * as Location from "expo-location";
 import Toast from "react-native-root-toast";
 import { Formik } from "formik";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector, useDispatch } from "react-redux";
 
 import Icon from "../../../../assets/icons";
 import resps from "../../../../assets/typo";
 import { useTheme } from "../../../../context/themeContext";
 import { keyboardVerticalOffset } from "../../../../helpers/common";
 import { pickImage } from "../../../../helpers/permissions";
+import {
+  uploadImage,
+  updatedoc,
+} from "../../../../helpers/firebasefunctions/firebasefuncs";
+import { fetchServicesByUserId } from "../../../../store/reducers/services";
+import { routes } from "../../../navigation/routes";
 
 import serviceSchema from "../../../../utlis/schemas/service";
 import CustomStatusBar from "../../../common/CustomStatusBar";
@@ -34,19 +41,51 @@ export default function UpdateService(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = React.useState(false);
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state?.services);
   const [image, setImage] = React.useState(null);
+  const item = props?.route?.params?.item;
+  const user = useSelector((state) => state?.auth);
 
   async function handleSubmit(values) {
-    if (image === null) {
-      alertdata("Image required");
-      return;
+    setIsLoading(true);
+    try {
+      const coords = await getAddressCoordinates(values.address);
+      let body = {
+        desc: values?.desc,
+        title: values?.title,
+        address: values?.address,
+        location: {
+          latitude: coords.latitude ?? item?.location?.latitude,
+          longitude: coords.longitude ?? item?.location?.longitude,
+        },
+      };
+      if (image !== null) {
+        const res = await uploadImage("services", image?.assets[0]);
+        if (res?.status) {
+          body.picture = res?.url;
+        }
+      }
+      await updatedoc("services", item?.id, body);
+      Toast.show("Service updated", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.success,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+      dispatch(fetchServicesByUserId(user?.user?.userid));
+      props?.navigation?.navigate(routes?.tabScreen);
+    } catch (e) {
+      console.log("ERROR", e);
+      Toast.show("Failed to update", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.warning,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+    } finally {
+      setIsLoading(false);
     }
-    const coords = await getAddressCoordinates(values.address);
-    if (coords) {
-      console.log("I am cords", coords);
-    }
-
-    console.log(values);
   }
 
   //add image
@@ -91,10 +130,7 @@ export default function UpdateService(props) {
       });
     }
   };
-  //alert
-  const alertdata = (message = "") => {
-    Alert.alert("Required", message);
-  };
+
   //sideffects
   React.useEffect(() => {
     (async () => {
@@ -191,7 +227,7 @@ export default function UpdateService(props) {
           translucent={true}
         />
       )}
-      <Loading show={isLoading} />
+      <Loading show={isLoading || loading} />
       <PlainHeader
         onPress={() => {
           props?.navigation?.pop();
@@ -204,12 +240,13 @@ export default function UpdateService(props) {
       >
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
           <Formik
+            enableReinitialize={true}
             validateOnBlur={false}
             validateOnChange={false}
             initialValues={{
-              title: "",
-              desc: "",
-              address: "",
+              title: item?.title,
+              desc: item?.desc,
+              address: item?.address,
             }}
             validationSchema={serviceSchema}
             onSubmit={(values) => handleSubmit(values)}
@@ -242,10 +279,12 @@ export default function UpdateService(props) {
                       onPress={handleUploadImage}
                       style={styles.upload}
                     >
-                      {image ? (
+                      {image || item?.picture ? (
                         <Image
                           style={styles.serviceimg}
-                          source={{ uri: image?.assets[0]?.uri }}
+                          source={{
+                            uri: image ? image?.assets[0]?.uri : item?.picture,
+                          }}
                         />
                       ) : (
                         <Icon.AntDesign

@@ -5,8 +5,11 @@ import {
   getFirestore,
   addDoc,
   getDoc,
+  getDocs,
   collection,
   deleteDoc,
+  query,
+  where,
   updateDoc as firestoreUpdateDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -55,7 +58,7 @@ export const updatedoc = async (collectionname, id, body) => {
     const data = await firestoreUpdateDoc(docRef, body);
     return data;
   } catch (e) {
-    console.log(e);
+    console.log("Err updating", e);
     return false;
   }
 };
@@ -74,7 +77,37 @@ export const getsingledoc = async (collectionname, id) => {
 
 // Get group of docs
 // You can implement this function if needed
+// Get all documents in a collection
+export const getAllDocs = async (collectionName) => {
+  try {
+    const querySnapshot = await getDocs(collection(db, collectionName));
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return data;
+  } catch (error) {
+    console.error("Error getting documents: ", error);
+    return [];
+  }
+};
 
+// Get documents in a collection based on a specific user ID
+export const getDocsByUserId = async (collectionName, userId) => {
+  try {
+    const querySnapshot = await getDocs(
+      query(collection(db, collectionName), where("userid", "==", userId))
+    );
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return data;
+  } catch (error) {
+    console.error("Error getting documents by user ID: ", error);
+    return [];
+  }
+};
 // Upload image to storage
 export const uploadImage = async (folder, imageFile) => {
   try {

@@ -12,12 +12,18 @@ import React from "react";
 import Toast from "react-native-root-toast";
 import { Formik } from "formik";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 
 import { useTheme } from "../../../../context/themeContext";
 import { images } from "../../../../assets/images";
 import { ProfileSchema } from "../../../../utlis/schemas/auth";
-import { keyboardVerticalOffset } from "../../../../helpers/common";
+import { keyboardVerticalOffset, validValue } from "../../../../helpers/common";
 import { pickImage } from "../../../../helpers/permissions";
+import { fetchOwnProfile } from "../../../../store/reducers/profile";
+import {
+  updatedoc,
+  uploadImage,
+} from "../../../../helpers/firebasefunctions/firebasefuncs";
 
 import resps from "../../../../assets/typo";
 import CustomStatusBar from "../../../common/CustomStatusBar";
@@ -26,11 +32,28 @@ import Button from "../../../common/Button";
 import CustomTextInput from "../../../common/TextInput";
 import CustomMultiLineTextInput from "../../../common/MultiLineInput";
 import Icon from "../../../../assets/icons";
+import Loading from "../../../common/Loading";
 
 export default function UpdateProfile(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const [image, setImage] = React.useState(null);
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const user = useSelector((state) => state?.auth);
+  const profile = useSelector((state) => state?.profile);
+
+  //get img state
+  const getImgState = (image, url) => {
+    if (validValue(image)) {
+      return { uri: image?.assets[0]?.uri };
+    }
+    if (validValue(url)) {
+      return { uri: url };
+    }
+    return images.UserProfile;
+  };
+  //end
   const handleUploadImage = async () => {
     try {
       const img = await pickImage();
@@ -53,7 +76,45 @@ export default function UpdateProfile(props) {
       });
     }
   };
-
+  //onSubmit
+  async function handleSubmit(values) {
+    setIsLoading(true);
+    try {
+      let body = {
+        name: values?.name,
+        bio: values?.bio,
+      };
+      if (image !== null) {
+        const res = await uploadImage("profiles", image?.assets[0]);
+        if (res?.status) {
+          body.profilepic = res?.url;
+        }
+      }
+      await updatedoc("users", user?.user?.userid, body);
+      Toast.show("Profile updated", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.success,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+      dispatch(fetchOwnProfile(user?.user?.userid));
+      props?.navigation?.pop();
+    } catch (e) {
+      console.log("ERROR", e);
+      Toast.show("Failed to update", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.warning,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  //sideffects
+  React.useEffect(() => {
+    dispatch(fetchOwnProfile(user?.user?.userid));
+  }, []);
   //styles
   const styles = StyleSheet.create({
     container: {
@@ -101,6 +162,7 @@ export default function UpdateProfile(props) {
           translucent={true}
         />
       )}
+      <Loading show={profile?.isLoading || isLoading} />
       <PlainHeader
         name="Update Profile"
         onPress={() => {
@@ -118,9 +180,7 @@ export default function UpdateProfile(props) {
             />
             <Image
               style={styles.dp}
-              source={
-                image ? { uri: image?.assets[0]?.uri } : images.UserProfile
-              }
+              source={getImgState(image, profile?.profile?.profilepic)}
             />
           </View>
         </TouchableOpacity>
@@ -135,7 +195,10 @@ export default function UpdateProfile(props) {
             enableReinitialize={true}
             validateOnBlur={false}
             validateOnChange={false}
-            initialValues={{ name: "", bio: "" }}
+            initialValues={{
+              name: profile?.profile?.name,
+              bio: profile?.profile?.bio,
+            }}
             validationSchema={ProfileSchema}
             onSubmit={(values) => handleSubmit(values)}
           >

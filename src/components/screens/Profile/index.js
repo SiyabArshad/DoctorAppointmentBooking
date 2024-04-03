@@ -11,22 +11,26 @@ import React from "react";
 
 import Toast from "react-native-root-toast";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { images } from "../../../assets/images/index";
 import { useTheme } from "../../../context/themeContext";
 import { routes } from "../../navigation/routes";
 import { logout } from "../../../store/reducers/auth";
+import { fetchOwnProfile } from "../../../store/reducers/profile";
+import { validValue } from "../../../helpers/common";
 
 import Icon from "../../../assets/icons";
 import resps from "../../../assets/typo";
 import CustomStatusBar from "../../common/CustomStatusBar";
+import Loading from "../../common/Loading";
 
 export default function ProfileScreen(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
-
+  const user = useSelector((state) => state?.auth);
+  const profile = useSelector((state) => state?.profile);
   //logout Func
   const logoutFunc = async () => {
     try {
@@ -47,6 +51,10 @@ export default function ProfileScreen(props) {
       });
     }
   };
+  //sideffects
+  React.useEffect(() => {
+    dispatch(fetchOwnProfile(user?.user?.userid));
+  }, []);
   //styles
   const styles = StyleSheet.create({
     container: {
@@ -72,8 +80,9 @@ export default function ProfileScreen(props) {
     dp: {
       height: resps.hp(8),
       width: resps.hp(8),
-      resizeMode: "contain",
+      resizeMode: "cover",
       marginVertical: resps.hp(2),
+      borderRadius: resps.hp(4),
     },
     desc: {
       lineHeight: resps.hp(2.7),
@@ -107,23 +116,28 @@ export default function ProfileScreen(props) {
           translucent={true}
         />
       )}
+      <Loading show={profile?.isLoading} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.center}>
-            <Image style={styles.dp} source={images.UserProfile} />
+            <Image
+              style={styles.dp}
+              source={
+                validValue(profile?.profile?.profilepic)
+                  ? { uri: profile?.profile?.profilepic }
+                  : images.UserProfile
+              }
+            />
           </View>
-          <Text style={styles.name}>Ahmed ul Hassam</Text>
+          <Text style={styles.name}>
+            {validValue(profile?.profile?.name)
+              ? profile?.profile?.name
+              : "No name"}
+          </Text>
           <Text style={styles.desc}>
-            It is a long established fact that a reader will be distracted by
-            the readable content of a page when looking at its layout. The point
-            of using Lorem Ipsum is that it has a more-or-less normal
-            distribution of letters, as opposed to using 'Content here, content
-            here', making it look like readable English. Many desktop publishing
-            packages and web page editors now use Lorem Ipsum as their default
-            model text, and a search for 'lorem ipsum' will uncover many web
-            sites still in their infancy. Various versions have evolved over the
-            years, sometimes by accident, sometimes on purpose injected humour
-            and the like.
+            {validValue(profile?.profile?.bio)
+              ? profile?.profile?.bio
+              : "No Bio added yet"}
           </Text>
         </View>
         <View style={styles.controls}>

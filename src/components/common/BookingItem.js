@@ -3,6 +3,8 @@ import React from "react";
 
 import PropTypes from "prop-types";
 import { Swipeable } from "react-native-gesture-handler";
+import { useSelector } from "react-redux";
+
 import { images } from "../../assets/images";
 import { useTheme } from "../../context/themeContext";
 
@@ -11,6 +13,7 @@ import resps from "../../assets/typo";
 
 export default function BookingItem({ item, index }) {
   const { theme } = useTheme();
+  const user = useSelector((state) => state?.auth);
   const ref = React.useRef(null);
 
   const declineFunction = () => {
@@ -107,7 +110,7 @@ export default function BookingItem({ item, index }) {
     <Swipeable
       ref={ref}
       renderLeftActions={LeftUi}
-      renderRightActions={RightUi}
+      renderRightActions={user?.user?.isAdmin && RightUi}
     >
       <View style={styles.card}>
         <Image source={images.dummyServiceImage} style={styles.serviceimg} />

@@ -12,6 +12,7 @@ import React from "react";
 import Toast from "react-native-root-toast";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
+import { Switch } from "react-native-paper";
 
 import { images } from "../../../assets/images/index";
 import { useTheme } from "../../../context/themeContext";
@@ -26,11 +27,16 @@ import CustomStatusBar from "../../common/CustomStatusBar";
 import Loading from "../../common/Loading";
 
 export default function ProfileScreen(props) {
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.auth);
   const profile = useSelector((state) => state?.profile);
+  const [isSwitchOn, setIsSwitchOn] = React.useState(false);
+  const onToggleSwitch = () => {
+    toggleTheme();
+    setIsSwitchOn(!isSwitchOn);
+  };
   //logout Func
   const logoutFunc = async () => {
     try {
@@ -106,6 +112,22 @@ export default function ProfileScreen(props) {
       color: theme.black,
       fontWeight: "500",
     },
+    themecon: {
+      marginBottom: resps.hp(2),
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      paddingRight: resps.wp(2),
+    },
+    togglecon: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: resps.wp(3),
+    },
+    themetext: {
+      color: theme.black,
+    },
   });
   return (
     <View style={styles.container}>
@@ -141,6 +163,18 @@ export default function ProfileScreen(props) {
           </Text>
         </View>
         <View style={styles.controls}>
+          <View style={styles.themecon}>
+            <View style={styles.togglecon}>
+              <Text style={styles.themetext}>Switch Theme</Text>
+              <Switch
+                color={theme.primary}
+                thumbColor={theme.primary}
+                value={isSwitchOn}
+                onValueChange={onToggleSwitch}
+              />
+            </View>
+          </View>
+
           <TouchableOpacity
             onPress={() => props?.navigation?.navigate(routes.updateProfile)}
             style={styles.btn}

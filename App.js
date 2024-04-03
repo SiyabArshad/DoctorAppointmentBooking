@@ -4,6 +4,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { PaperProvider } from "react-native-paper";
 
 import RootNavigation from "./src/components/navigation";
 import { ThemeProvider } from "./src/context/themeContext";
@@ -17,9 +18,11 @@ export default function App() {
         <RootSiblingParent>
           <ThemeProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
-              <SafeAreaProvider>
-                <RootNavigation />
-              </SafeAreaProvider>
+              <PaperProvider>
+                <SafeAreaProvider>
+                  <RootNavigation />
+                </SafeAreaProvider>
+              </PaperProvider>
             </GestureHandlerRootView>
           </ThemeProvider>
         </RootSiblingParent>

@@ -24,7 +24,7 @@ import { routes } from "../../../navigation/routes";
 import { app } from "../../../../utlis/firebase";
 
 import CustomStatusBar from "../../../common/CustomStatusBar";
-import PlainHeader from "../../../common/PlainHeader";
+// import PlainHeader from "../../../common/PlainHeader";
 import Button from "../../../common/Button";
 import CustomTextInput from "../../../common/TextInput";
 import Loading from "../../../common/Loading";
@@ -113,11 +113,11 @@ export default function Signup(props) {
         />
       )}
       <Loading show={isload} />
-      <PlainHeader
+      {/* <PlainHeader
         onPress={() => {
           props?.navigation?.pop();
         }}
-      />
+      /> */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={keyboardVerticalOffset}

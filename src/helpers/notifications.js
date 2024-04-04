@@ -21,7 +21,28 @@ export async function sendPushNotification(expoPushToken, title, body, desc) {
     body: JSON.stringify(message),
   });
 }
+//schedule notifications
+export async function scheduleNotificationAsync(
+  title,
+  body,
+  seconds,
+  recipientToken
+) {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: title,
+      body: body,
+    },
+    trigger: {
+      seconds: seconds,
+    },
+    channelId: "default",
+    data: {},
+    to: recipientToken,
+  });
+}
 
+//end
 export async function registerForPushNotificationsAsync() {
   let token;
 

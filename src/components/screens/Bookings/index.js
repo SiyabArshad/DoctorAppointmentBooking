@@ -20,7 +20,11 @@ import {
   getsingledoc,
 } from "../../../helpers/firebasefunctions/firebasefuncs";
 import { bookingStatus, validValue } from "../../../helpers/common";
-import { sendPushNotification } from "../../../helpers/notifications";
+import {
+  sendPushNotification,
+  scheduleNotificationAsync,
+} from "../../../helpers/notifications";
+import { getSecondsUntil } from "../../../helpers/dates";
 
 import CustomStatusBar from "../../common/CustomStatusBar";
 import BookingItem from "../../common/BookingItem";
@@ -67,8 +71,17 @@ export default function Bookings(props) {
             `${user?.user?.name} has ${bookingStatus.confirmed} appointment on ${item?.bookingdate} between ${item?.slot}`,
             `${user?.user?.name} has ${bookingStatus.confirmed} appointment on ${item?.bookingdate} between ${item?.slot}`
           );
+          const inputDateTime = `${item?.bookingdate} ${hr(
+            item?.slot?.split(":")[0]
+          )}`;
+          const secs = getSecondsUntil(inputDateTime);
+          await scheduleNotificationAsync(
+            "Appointment Reminder",
+            `You have an appointment with ${user?.user?.name} in next 1 hour`,
+            secs,
+            currentUser?.data()?.devicetoken
+          );
         }
-
         dispatch(
           fetchBookings({ id: user?.user?.userid, admin: user?.user?.isAdmin })
         );
@@ -92,6 +105,31 @@ export default function Bookings(props) {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+  //helper
+  const hr = (inp) => {
+    switch (inp) {
+      case 9:
+        return `${inp}am`;
+      case 10:
+        return `${inp}am`;
+      case 11:
+        return `${inp}am`;
+      case 12:
+        return `${inp}pm`;
+      case 1:
+        return `${inp}pm`;
+      case 2:
+        return `${inp}pm`;
+      case 3:
+        return `${inp}pm`;
+      case 4:
+        return `${inp}pm`;
+      case 5:
+        return `${inp}pm`;
+      default:
+        return `${inp}pm`;
     }
   };
   //onDeclined

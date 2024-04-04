@@ -19,11 +19,13 @@ import { useDispatch } from "react-redux";
 import Icon from "../../../../assets/icons";
 import resps from "../../../../assets/typo";
 import { useTheme } from "../../../../context/themeContext";
-import { keyboardVerticalOffset } from "../../../../helpers/common";
+import { keyboardVerticalOffset, validValue } from "../../../../helpers/common";
 import { LoginSchema } from "../../../../utlis/schemas/auth";
 import { routes } from "../../../navigation/routes";
 import { login } from "../../../../store/reducers/auth";
 import { app } from "../../../../utlis/firebase";
+import { registerForPushNotificationsAsync } from "../../../../helpers/notifications";
+import { updatedoc } from "../../../../helpers/firebasefunctions/firebasefuncs";
 
 import CustomStatusBar from "../../../common/CustomStatusBar";
 import PlainHeader from "../../../common/PlainHeader";
@@ -49,8 +51,15 @@ export default function Login(props) {
       );
       const myDocRef = doc(db, "users", userinfo.user.uid);
       const response = await getDoc(myDocRef);
-      if (response.exists()) {
-        dispatch(login(response.data()));
+
+      if (response?.exists()) {
+        const token = await registerForPushNotificationsAsync();
+        if (validValue(token)) {
+          await updatedoc("users", userinfo.user.uid, {
+            devicetoken: token,
+          });
+        }
+        dispatch(login(response?.data()));
         Toast.show("Loggedin Sucessfully", {
           duration: Toast.durations.LONG,
           backgroundColor: theme.success,

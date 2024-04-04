@@ -19,7 +19,8 @@ import {
   addnewdocumenttofiretore,
   getsingledoc,
 } from "../../../helpers/firebasefunctions/firebasefuncs";
-import { bookingStatus } from "../../../helpers/common";
+import { bookingStatus, validValue } from "../../../helpers/common";
+import { sendPushNotification } from "../../../helpers/notifications";
 
 import CustomStatusBar from "../../common/CustomStatusBar";
 import BookingItem from "../../common/BookingItem";
@@ -58,6 +59,16 @@ export default function Bookings(props) {
           opacity: 0.8,
           position: Toast.positions.TOP,
         });
+        const currentUser = await getsingledoc("users", item?.from);
+        if (validValue(currentUser?.data()?.devicetoken)) {
+          await sendPushNotification(
+            currentUser?.data()?.devicetoken,
+            "Booking Request",
+            `${user?.user?.name} has ${bookingStatus.confirmed} appointment on ${item?.bookingdate} between ${item?.slot}`,
+            `${user?.user?.name} has ${bookingStatus.confirmed} appointment on ${item?.bookingdate} between ${item?.slot}`
+          );
+        }
+
         dispatch(
           fetchBookings({ id: user?.user?.userid, admin: user?.user?.isAdmin })
         );
@@ -106,6 +117,15 @@ export default function Bookings(props) {
           opacity: 0.8,
           position: Toast.positions.TOP,
         });
+        const currentUser = await getsingledoc("users", item?.from);
+        if (validValue(currentUser?.data()?.devicetoken)) {
+          await sendPushNotification(
+            currentUser?.data()?.devicetoken,
+            "Booking Request",
+            `${user?.user?.name} has ${bookingStatus.declined} appointment on ${item?.bookingdate} between ${item?.slot}`,
+            `${user?.user?.name} has ${bookingStatus.declined} appointment on ${item?.bookingdate} between ${item?.slot}`
+          );
+        }
         dispatch(
           fetchBookings({ id: user?.user?.userid, admin: user?.user?.isAdmin })
         );
@@ -148,6 +168,16 @@ export default function Bookings(props) {
           status: bookingStatus.cancelled,
         });
         await addnewdocumenttofiretore("notifications", notificationBody, null);
+
+        const currentUser = await getsingledoc("users", item?.to);
+        if (validValue(currentUser?.data()?.devicetoken)) {
+          await sendPushNotification(
+            currentUser?.data()?.devicetoken,
+            "Booking Request",
+            `${user?.user?.name} has ${bookingStatus.cancelled} appointment on ${item?.bookingdate} between ${item?.slot}`,
+            `${user?.user?.name} has ${bookingStatus.cancelled} appointment on ${item?.bookingdate} between ${item?.slot}`
+          );
+        }
         Toast.show("Booking status updated successfully.", {
           duration: Toast.durations.LONG,
           backgroundColor: theme.success,
@@ -168,7 +198,8 @@ export default function Bookings(props) {
           fetchBookings({ id: user?.user?.userid, admin: user?.user?.isAdmin })
         );
       }
-    } catch {
+    } catch (e) {
+      console.log("err", e);
       Toast.show("Failed to Cancel bookings.", {
         duration: Toast.durations.LONG,
         backgroundColor: theme.warning,

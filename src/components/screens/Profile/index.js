@@ -20,6 +20,7 @@ import { routes } from "../../navigation/routes";
 import { logout } from "../../../store/reducers/auth";
 import { fetchOwnProfile } from "../../../store/reducers/profile";
 import { validValue } from "../../../helpers/common";
+import { updatedoc } from "../../../helpers/firebasefunctions/firebasefuncs";
 
 import Icon from "../../../assets/icons";
 import resps from "../../../assets/typo";
@@ -33,13 +34,16 @@ export default function ProfileScreen(props) {
   const user = useSelector((state) => state?.auth);
   const profile = useSelector((state) => state?.profile);
   const [isSwitchOn, setIsSwitchOn] = React.useState(false);
+  const [isloading, setIsloading] = React.useState(false);
   const onToggleSwitch = () => {
     toggleTheme();
     setIsSwitchOn(!isSwitchOn);
   };
   //logout Func
   const logoutFunc = async () => {
+    setIsloading(true);
     try {
+      await updatedoc("users", user?.user?.userid, { devicetoken: "" });
       dispatch(logout());
       Toast.show("Loggedout Sucessfully", {
         duration: Toast.durations.LONG,
@@ -55,6 +59,8 @@ export default function ProfileScreen(props) {
         opacity: 0.8,
         position: Toast.positions.TOP,
       });
+    } finally {
+      setIsloading(false);
     }
   };
   //sideffects
@@ -138,7 +144,7 @@ export default function ProfileScreen(props) {
           translucent={true}
         />
       )}
-      <Loading show={profile?.isLoading} />
+      <Loading show={profile?.isLoading || isloading} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.center}>

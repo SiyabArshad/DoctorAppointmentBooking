@@ -22,11 +22,13 @@ import {
   deletdoc,
   addnewdocumenttofiretore,
   getBookingsByServiceidandDate,
+  getsingledoc,
 } from "../../../helpers/firebasefunctions/firebasefuncs";
 import { fetchServicesByUserId } from "../../../store/reducers/services";
 import { fetchBookings } from "../../../store/reducers/bookings";
 import { WeedDaySlots, SatSlot } from "../../../utlis/common";
 import { validValue, bookingStatus } from "../../../helpers/common";
+import { sendPushNotification } from "../../../helpers/notifications";
 
 import CustomStatusBar from "../../common/CustomStatusBar";
 import Button from "../../common/Button";
@@ -107,6 +109,17 @@ export default function DetailScreen(props) {
         ).toLocaleDateString()} between ${selectedSlot}`,
         isread: false,
       };
+      const currentUser = await getsingledoc("users", item?.userid);
+      if (validValue(currentUser?.data()?.devicetoken)) {
+        await sendPushNotification(
+          currentUser?.data()?.devicetoken,
+          "Booking Request",
+          `${user?.user?.name} has requested appointment`,
+          `On this date  ${new Date(
+            date
+          ).toLocaleDateString()} between ${selectedSlot}`
+        );
+      }
       await addnewdocumenttofiretore("bookings", body, null);
       await addnewdocumenttofiretore("notifications", notificationBody, null);
       //do redux operation for sync

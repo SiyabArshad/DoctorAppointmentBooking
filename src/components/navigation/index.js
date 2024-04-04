@@ -1,5 +1,4 @@
 import React from "react";
-
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useSelector } from "react-redux";
@@ -18,6 +17,7 @@ import BottomTab from "./Bottomtab";
 const Stack = createNativeStackNavigator();
 export default function RootNavigation() {
   const user = useSelector((state) => state?.auth);
+
   return (
     <NavigationContainer>
       <Stack.Navigator

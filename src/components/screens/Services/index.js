@@ -134,7 +134,7 @@ export default function Services(props) {
           renderItem={({ item, index }) => (
             <ServiceItem
               onPress={() =>
-                props?.navigation?.navigate(routes.detailScreen, { item })
+                props?.navigation?.navigate(routes.detailScreen, { item, date })
               }
               item={item}
               index={index}

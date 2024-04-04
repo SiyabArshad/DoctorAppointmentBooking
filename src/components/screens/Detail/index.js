@@ -18,8 +18,13 @@ import Icon from "../../../assets/icons";
 import resps from "../../../assets/typo";
 import { useTheme } from "../../../context/themeContext";
 import { routes } from "../../navigation/routes";
-import { deletdoc } from "../../../helpers/firebasefunctions/firebasefuncs";
+import {
+  deletdoc,
+  addnewdocumenttofiretore,
+} from "../../../helpers/firebasefunctions/firebasefuncs";
 import { fetchServicesByUserId } from "../../../store/reducers/services";
+import { WeedDaySlots, SatSlot } from "../../../utlis/common";
+import { validValue, bookingStatus } from "../../../helpers/common";
 
 import CustomStatusBar from "../../common/CustomStatusBar";
 import Button from "../../common/Button";
@@ -33,6 +38,9 @@ export default function DetailScreen(props) {
   const [isLoad, setIsLoad] = React.useState(false);
   const user = useSelector((state) => state?.auth);
   const item = props?.route?.params?.item;
+  const date = props?.route?.params?.date;
+  const [slots, setSlots] = React.useState(WeedDaySlots);
+  const [selectedSlot, setSelectedSlot] = React.useState("");
   //handle delete
   const handleDelete = () => {
     Alert.alert("Delete", "Are you sure you want to delete this service?", [
@@ -49,13 +57,13 @@ export default function DetailScreen(props) {
             await deletdoc("services", item?.id);
 
             dispatch(fetchServicesByUserId(user?.user?.userid));
-            props?.navigation?.navigate(routes?.tabScreen);
             Toast.show("Service deleted successfully.", {
               duration: Toast.durations.LONG,
               backgroundColor: theme.success,
               opacity: 0.8,
               position: Toast.positions.TOP,
             });
+            props?.navigation?.navigate(routes?.tabScreen);
           } catch {
             Toast.show("Failed to delete service.", {
               duration: Toast.durations.LONG,
@@ -71,6 +79,61 @@ export default function DetailScreen(props) {
       },
     ]);
   };
+  //handle booking and notification db operation
+  const onBooknow = async () => {
+    setIsLoad(true);
+    try {
+      let body = {
+        serviceid: item?.id,
+        from: user?.user?.userid,
+        to: item?.userid,
+        title: item?.title,
+        picture: item?.picture,
+        status: bookingStatus?.pending,
+        date: date,
+        slot: selectedSlot,
+        name: user?.user?.name,
+        address: item?.address,
+        bookingdate: new Date(date).toLocaleDateString(),
+      };
+      let notificationBody = {
+        to: item?.userid, //to whom notification will be delivered
+        from: user?.user?.userid, //who send this
+        title: "Booking Request",
+        desc: `${user?.user?.name} has requested appointment on ${new Date(
+          date
+        ).toLocaleDateString()} between ${selectedSlot}`,
+        isread: false,
+      };
+      await addnewdocumenttofiretore("bookings", body, null);
+      await addnewdocumenttofiretore("notifications", notificationBody, null);
+      //do redux operation for sync
+      Toast.show("Booking requested successfully.", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.success,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+      props?.navigation?.navigate(routes?.tabScreen);
+    } catch {
+      Toast.show("Failed to book service.", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.warning,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+    } finally {
+      setIsLoad(false);
+    }
+  };
+  //sideffects
+  React.useEffect(() => {
+    if (new Date(date).getDay() === 6) {
+      setSlots(SatSlot);
+    } else {
+      setSlots(WeedDaySlots);
+    }
+  }, [props?.route]);
   //styles
   const styles = StyleSheet.create({
     container: {
@@ -227,12 +290,20 @@ export default function DetailScreen(props) {
             <Text style={styles.desc}>{item?.desc}</Text>
           </View>
           <View style={styles.slots}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((item, index) => (
+            {slots?.map((item, index) => (
               <TouchableOpacity
-                style={styles.slotdisable}
+                onPress={() => setSelectedSlot(item?.time)}
+                disabled={item?.disable}
+                style={[
+                  item?.disable ? styles.slotdisable : styles.slot,
+                  {
+                    backgroundColor:
+                      selectedSlot === item.time ? theme.primary : theme.white,
+                  },
+                ]}
                 key={index.toLocaleString()}
               >
-                <Text style={styles.time}>9:00 - 10:00</Text>
+                <Text style={styles.time}>{item?.time}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -240,7 +311,11 @@ export default function DetailScreen(props) {
       </ScrollView>
       {item?.userid !== user?.user?.userid && (
         <View style={styles.bookinhcontrol}>
-          <Button text={"Book now"} onPress={() => {}} />
+          <Button
+            disabled={!validValue(date) || !validValue(selectedSlot)}
+            text={"Book now"}
+            onPress={onBooknow}
+          />
         </View>
       )}
     </View>

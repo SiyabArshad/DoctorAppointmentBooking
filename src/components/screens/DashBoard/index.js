@@ -107,7 +107,10 @@ export default function DashBoard(props) {
           renderItem={({ item, index }) => (
             <ServiceItem
               onPress={() =>
-                props?.navigation?.navigate(routes.detailScreen, { item })
+                props?.navigation?.navigate(routes.detailScreen, {
+                  item,
+                  date: null,
+                })
               }
               item={item}
               index={index}

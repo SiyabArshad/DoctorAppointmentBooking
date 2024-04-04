@@ -24,7 +24,8 @@
       },
       "permissions": [
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "package": "com.siyab99.jservices"
     },
     "web": {
       "favicon": "./assets/favicon.png"

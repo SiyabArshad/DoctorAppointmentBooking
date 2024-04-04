@@ -5,23 +5,74 @@ import {
   Platform,
   FlatList,
   Image,
+  RefreshControl,
 } from "react-native";
 import React from "react";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { useTheme } from "../../../../context/themeContext";
 import { images } from "../../../../assets/images";
+import { getAppointmentsHistoryByUserId } from "../../../../helpers/firebasefunctions/firebasefuncs";
+import { validValue } from "../../../../helpers/common";
 
 import resps from "../../../../assets/typo";
 import CustomStatusBar from "../../../common/CustomStatusBar";
 import PlainHeader from "../../../common/PlainHeader";
 import Empty from "../../../common/Empty";
+import Loading from "../../../common/Loading";
 
 export default function History(props) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-
+  const [isLoading, setIsLoading] = React.useState(false);
+  const user = useSelector((state) => state?.auth);
+  const [bookings, setBookings] = React.useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+  //loading data
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getAppointmentsHistoryByUserId(
+        user?.user?.userid,
+        user?.user?.isAdmin
+      );
+      setBookings(data);
+    } catch {
+      Toast.show("Failed to load appointments.", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.warning,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  //onRefresh
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      loadData();
+    } catch {
+      Toast.show("Failed to load appointments.", {
+        duration: Toast.durations.LONG,
+        backgroundColor: theme.warning,
+        opacity: 0.8,
+        position: Toast.positions.TOP,
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  };
+  //sideeffects
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [])
+  );
   //styles
   const styles = StyleSheet.create({
     container: {
@@ -90,36 +141,51 @@ export default function History(props) {
           translucent={true}
         />
       )}
+      <Loading show={isLoading} />
       <PlainHeader
         name="Appointments History"
         onPress={() => {
           props?.navigation?.pop();
         }}
       />
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
-        data={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image
-              source={images.dummyServiceImage}
-              style={styles.serviceimg}
-            />
-            <View style={styles.texts}>
-              <Text style={styles.h2}>Asteria hotel</Text>
-              <Text style={styles.h5}>Wilora NT 0872, Australia</Text>
-              <Text style={styles.p}>Json King</Text>
-              <Text style={styles.p}>09/08/2024 17:30</Text>
-              <View style={styles.tag}>
-                <Text style={styles.price}>Pending</Text>
+      {bookings?.length > 0 ? (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scroll}
+          data={bookings}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Image
+                source={
+                  validValue(item?.picture)
+                    ? { uri: item?.picture }
+                    : images.dummyServiceImage
+                }
+                style={styles.serviceimg}
+              />
+              <View style={styles.texts}>
+                <Text style={styles.h2}>{item?.title}</Text>
+                <Text style={styles.h5}>{item?.address}</Text>
+                {user?.user?.isAdmin && (
+                  <Text style={styles.p}>{item?.name}</Text>
+                )}
+                <Text style={styles.p}>{`${item?.bookingdate} ${"  "} ${
+                  item?.slot
+                }`}</Text>
+                <View style={styles.tag}>
+                  <Text style={styles.price}>{item?.status}</Text>
+                </View>
               </View>
             </View>
-          </View>
-        )}
-        keyExtractor={(_item, index) => index.toLocaleString()}
-      />
-      {/* <Empty /> */}
+          )}
+          keyExtractor={(_item, index) => index.toLocaleString()}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      ) : (
+        <Empty text="No History" />
+      )}
     </View>
   );
 }

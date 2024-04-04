@@ -13,6 +13,7 @@ import {
   updateDoc as firestoreUpdateDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { bookingStatus } from "../common";
 
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -123,6 +124,26 @@ export const getNotificationsByUserId = async (userId) => {
     return data;
   } catch (error) {
     console.error("Error getting notifications by user ID: ", error);
+    return [];
+  }
+};
+//get my appointments
+export const getAppointmentsHistoryByUserId = async (id, admin = false) => {
+  try {
+    const querySnapshot = await getDocs(
+      query(
+        collection(db, "bookings"),
+        where(admin ? "to" : "from", "==", id),
+        where("status", "===", bookingStatus.confirmed)
+      )
+    );
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return data;
+  } catch (error) {
+    console.error("Error getting appointments by user ID: ", error);
     return [];
   }
 };

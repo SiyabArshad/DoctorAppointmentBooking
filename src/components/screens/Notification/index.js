@@ -94,7 +94,10 @@ export default function Notifications(props) {
       paddingHorizontal: resps.wp(2),
       paddingVertical: resps.hp(1),
     },
-    texts: {},
+    texts: {
+      width: "80%",
+      overflow: "hidden",
+    },
     h2: {
       marginTop: resps.hp(1),
       marginBottom: resps.hp(0.3),
@@ -105,8 +108,6 @@ export default function Notifications(props) {
     p: {
       color: theme.black,
       marginBottom: resps.hp(0.5),
-      width: "70%",
-      overflow: "hidden",
     },
   });
   return (

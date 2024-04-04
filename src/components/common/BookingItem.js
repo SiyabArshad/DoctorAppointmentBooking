@@ -7,19 +7,35 @@ import { useSelector } from "react-redux";
 
 import { images } from "../../assets/images";
 import { useTheme } from "../../context/themeContext";
+import { validValue, bookingStatus } from "../../helpers/common";
 
 import Icon from "../../assets/icons";
 import resps from "../../assets/typo";
 
-export default function BookingItem({ item, index }) {
+export default function BookingItem({
+  item,
+  index,
+  onConfirmFunc,
+  onDeclineFunc,
+  onCancelledFunc,
+}) {
   const { theme } = useTheme();
   const user = useSelector((state) => state?.auth);
   const ref = React.useRef(null);
 
   const declineFunction = () => {
+    if (item?.status === bookingStatus.pending && user?.user?.isAdmin) {
+      onDeclineFunc(item);
+    }
+    if (item?.status === bookingStatus.pending && !user?.user?.isAdmin) {
+      onCancelledFunc(item);
+    }
     ref?.current?.close();
   };
   const confirmedFunction = () => {
+    if (item?.status === bookingStatus.pending) {
+      onConfirmFunc(item);
+    }
     ref?.current?.close();
   };
   //styles
@@ -109,18 +125,29 @@ export default function BookingItem({ item, index }) {
   return (
     <Swipeable
       ref={ref}
-      renderLeftActions={LeftUi}
-      renderRightActions={user?.user?.isAdmin && RightUi}
+      renderLeftActions={item?.status === bookingStatus.pending && LeftUi}
+      renderRightActions={
+        user?.user?.isAdmin && item?.status === bookingStatus.pending && RightUi
+      }
     >
       <View style={styles.card}>
-        <Image source={images.dummyServiceImage} style={styles.serviceimg} />
+        <Image
+          source={
+            validValue(item?.picture)
+              ? { uri: item?.picture }
+              : images.dummyServiceImage
+          }
+          style={styles.serviceimg}
+        />
         <View style={styles.texts}>
-          <Text style={styles.h2}>Asteria hotel</Text>
-          <Text style={styles.h5}>Wilora NT 0872, Australia</Text>
-          <Text style={styles.p}>Json King</Text>
-          <Text style={styles.p}>09/08/2024 17:30</Text>
+          <Text style={styles.h2}>{item?.title}</Text>
+          <Text style={styles.h5}>{item?.address}</Text>
+          {user?.user?.isAdmin && <Text style={styles.p}>{item?.name}</Text>}
+          <Text style={styles.p}>{`${item?.bookingdate} ${"  "} ${
+            item?.slot
+          }`}</Text>
           <View style={styles.tag}>
-            <Text style={styles.price}>Pending</Text>
+            <Text style={styles.price}>{item?.status}</Text>
           </View>
         </View>
       </View>

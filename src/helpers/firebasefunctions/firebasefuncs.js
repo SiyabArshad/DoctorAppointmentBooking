@@ -134,7 +134,7 @@ export const getAppointmentsHistoryByUserId = async (id, admin = false) => {
       query(
         collection(db, "bookings"),
         where(admin ? "to" : "from", "==", id),
-        where("status", "===", bookingStatus.confirmed)
+        where("status", "==", bookingStatus.confirmed)
       )
     );
     const data = querySnapshot.docs.map((doc) => ({
@@ -144,6 +144,22 @@ export const getAppointmentsHistoryByUserId = async (id, admin = false) => {
     return data;
   } catch (error) {
     console.error("Error getting appointments by user ID: ", error);
+    return [];
+  }
+};
+//get bookings
+export const getBookingsByUserId = async (id, admin = false) => {
+  try {
+    const querySnapshot = await getDocs(
+      query(collection(db, "bookings"), where(admin ? "to" : "from", "==", id))
+    );
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return data;
+  } catch (error) {
+    console.error("Error getting bookings by user ID: ", error);
     return [];
   }
 };

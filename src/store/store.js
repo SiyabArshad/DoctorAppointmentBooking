@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Authslice from "./reducers/auth";
 import ServiceSlice from "./reducers/services";
 import ProfileSlice from "./reducers/profile";
+import bookingSlice from "./reducers/bookings";
 
 const persistConfig = {
   key: "appointmentsBook",
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   auth: persistedReducer,
   services: ServiceSlice,
   profile: ProfileSlice,
+  bookings: bookingSlice,
 });
 
 export const store = configureStore({

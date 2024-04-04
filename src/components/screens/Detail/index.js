@@ -23,6 +23,7 @@ import {
   addnewdocumenttofiretore,
 } from "../../../helpers/firebasefunctions/firebasefuncs";
 import { fetchServicesByUserId } from "../../../store/reducers/services";
+import { fetchBookings } from "../../../store/reducers/bookings";
 import { WeedDaySlots, SatSlot } from "../../../utlis/common";
 import { validValue, bookingStatus } from "../../../helpers/common";
 
@@ -114,6 +115,9 @@ export default function DetailScreen(props) {
         opacity: 0.8,
         position: Toast.positions.TOP,
       });
+      dispatch(
+        fetchBookings({ id: user?.user?.userid, admin: user?.user?.isAdmin })
+      );
       props?.navigation?.navigate(routes?.tabScreen);
     } catch {
       Toast.show("Failed to book service.", {

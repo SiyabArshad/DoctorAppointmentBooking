@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import React from "react";
 
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -30,7 +31,19 @@ export default function DashBoard(props) {
   const user = useSelector((state) => state?.auth);
   const { services, loading } = useSelector((state) => state?.services);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [date, setDate] = React.useState(new Date());
+  const [showPicker, setShowPicker] = React.useState(false);
+  const futureDate = new Date(); // Get today's date
+  futureDate.setDate(futureDate.getDate() + 1); // Increment by one day
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowPicker(false);
+    setDate(currentDate);
+  };
 
+  const onDatepickerOpen = () => {
+    setShowPicker(true);
+  };
   //onRefresh
   const onRefresh = () => {
     setRefreshing(true);
@@ -76,6 +89,12 @@ export default function DashBoard(props) {
       display: "flex",
       alignItems: "center",
       flexDirection: "row",
+      gap: resps.wp(2),
+    },
+    selecteddate: {
+      paddingLeft: resps.wp(2),
+      color: theme.black,
+      fontWeight: "600",
     },
   });
   return (
@@ -88,7 +107,15 @@ export default function DashBoard(props) {
           translucent={true}
         />
       )}
-
+      {showPicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display="calendar"
+          minimumDate={futureDate} // Set the minimum date to tomorrow
+          onChange={onDateChange}
+        />
+      )}
       <View style={styles.header}>
         <Text style={styles.head}>Your Services</Text>
         <View style={styles.actions}>
@@ -97,8 +124,14 @@ export default function DashBoard(props) {
           >
             <Icon.AntDesign name="pluscircle" size={28} color={theme.primary} />
           </TouchableOpacity>
+          <TouchableOpacity onPress={onDatepickerOpen}>
+            <Icon.Fontisto name="date" size={28} color={theme.primary} />
+          </TouchableOpacity>
         </View>
       </View>
+      <Text style={styles.selecteddate}>{`Selected date ${new Date(
+        date
+      ).toLocaleDateString()}`}</Text>
       {services?.length > 0 ? (
         <FlatList
           showsVerticalScrollIndicator={false}
@@ -109,7 +142,7 @@ export default function DashBoard(props) {
               onPress={() =>
                 props?.navigation?.navigate(routes.detailScreen, {
                   item,
-                  date: null,
+                  date,
                 })
               }
               item={item}

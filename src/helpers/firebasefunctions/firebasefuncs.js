@@ -163,6 +163,29 @@ export const getBookingsByUserId = async (id, admin = false) => {
     return [];
   }
 };
+//check bookings with date and service id
+//get bookings
+export const getBookingsByServiceidandDate = async (id, date) => {
+  try {
+    const querySnapshot = await getDocs(
+      query(
+        collection(db, "bookings"),
+        where("serviceid", "==", id),
+        where("bookingdate", "==", date),
+        where("status", "==", bookingStatus.confirmed)
+      )
+    );
+    const data = querySnapshot.docs.map((doc) => ({
+      time: doc?.data()?.slot,
+      disable: true,
+    }));
+    return data;
+  } catch (error) {
+    console.error("Error getting bookings by service ID: ", error);
+    return [];
+  }
+};
+//end
 
 // Upload image to storage
 export const uploadImage = async (folder, imageFile) => {

@@ -21,6 +21,7 @@ import { routes } from "../../navigation/routes";
 import {
   deletdoc,
   addnewdocumenttofiretore,
+  getBookingsByServiceidandDate,
 } from "../../../helpers/firebasefunctions/firebasefuncs";
 import { fetchServicesByUserId } from "../../../store/reducers/services";
 import { fetchBookings } from "../../../store/reducers/bookings";
@@ -130,13 +131,47 @@ export default function DetailScreen(props) {
       setIsLoad(false);
     }
   };
+
+  //loading bookings
+  const onLoadData = async () => {
+    setIsLoad(true);
+    try {
+      let ans = [];
+      const res = await getBookingsByServiceidandDate(
+        item?.id,
+        new Date(date).toLocaleDateString()
+      );
+      if (new Date(date).getDay() === 6) {
+        ans = mergeArrays(SatSlot, res);
+      } else {
+        ans = mergeArrays(WeedDaySlots, res);
+      }
+      setSlots(ans);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoad(false);
+    }
+  };
+  function mergeArrays(array1, array2) {
+    const mergedArray = [];
+
+    // Iterate through array1
+    array1.forEach((item1) => {
+      // Find the corresponding item in array2
+      const item2 = array2.find((item) => item.time === item1.time);
+      // If item2 exists, update disable property, otherwise, keep it as it is
+      mergedArray.push({
+        time: item1.time,
+        disable: item2 ? item2.disable : item1.disable,
+      });
+    });
+
+    return mergedArray;
+  }
   //sideffects
   React.useEffect(() => {
-    if (new Date(date).getDay() === 6) {
-      setSlots(SatSlot);
-    } else {
-      setSlots(WeedDaySlots);
-    }
+    onLoadData();
   }, [props?.route]);
   //styles
   const styles = StyleSheet.create({
@@ -227,6 +262,21 @@ export default function DetailScreen(props) {
       gap: resps.wp(3),
     },
   });
+  const bgColorFunc = (disabled, selected) => {
+    if (selected) {
+      return {
+        backgroundColor: theme.primary,
+      };
+    }
+    if (disabled) {
+      return {
+        backgroundColor: theme.warning,
+      };
+    }
+    return {
+      backgroundColor: theme.white,
+    };
+  };
   return (
     <View style={styles.container}>
       <Loading show={isLoad || loading} />
@@ -293,21 +343,27 @@ export default function DetailScreen(props) {
             <Text style={styles.location}>{item?.address}</Text>
             <Text style={styles.desc}>{item?.desc}</Text>
           </View>
+
           <View style={styles.slots}>
             {slots?.map((item, index) => (
               <TouchableOpacity
                 onPress={() => setSelectedSlot(item?.time)}
-                disabled={item?.disable}
+                disabled={item?.disable || user?.user?.isAdmin}
                 style={[
                   item?.disable ? styles.slotdisable : styles.slot,
-                  {
-                    backgroundColor:
-                      selectedSlot === item.time ? theme.primary : theme.white,
-                  },
+
+                  bgColorFunc(item?.disable, selectedSlot === item.time),
                 ]}
                 key={index.toLocaleString()}
               >
-                <Text style={styles.time}>{item?.time}</Text>
+                <Text
+                  style={[
+                    styles.time,
+                    { color: item?.disable ? theme.white : theme.black },
+                  ]}
+                >
+                  {item?.time}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -316,7 +372,7 @@ export default function DetailScreen(props) {
       {item?.userid !== user?.user?.userid && (
         <View style={styles.bookinhcontrol}>
           <Button
-            disabled={!validValue(date) || !validValue(selectedSlot)}
+            disabled={!validValue(date) || !validValue(selectedSlot) || isLoad}
             text={"Book now"}
             onPress={onBooknow}
           />

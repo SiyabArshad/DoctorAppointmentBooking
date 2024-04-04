@@ -108,6 +108,25 @@ export const getDocsByUserId = async (collectionName, userId) => {
     return [];
   }
 };
+
+//notifications
+// Get documents in a collection based on a specific user ID
+export const getNotificationsByUserId = async (userId) => {
+  try {
+    const querySnapshot = await getDocs(
+      query(collection(db, "notifications"), where("to", "==", userId))
+    );
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return data;
+  } catch (error) {
+    console.error("Error getting notifications by user ID: ", error);
+    return [];
+  }
+};
+
 // Upload image to storage
 export const uploadImage = async (folder, imageFile) => {
   try {
